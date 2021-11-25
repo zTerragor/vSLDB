@@ -1,5 +1,5 @@
-# vSLDB - BFA (8.3.7) and SL 9.1.5 worlddatabase
-BFA + Shadowlands 9.1 DB
+# vS/LDB - BFA + Shadowkands Preservation project
+BFA 8.3.7 + Shadowlands 9.1 
 
 Доброго времени суток, здесь мы собираемся реализовать наиболее полную базу данных  по BFA + Shadowlands 9.1
 Заинтересовало и хочешь присоединиться к нам ? стучись в Дискорд: https://discord.gg/YxHEMm5Jk6
