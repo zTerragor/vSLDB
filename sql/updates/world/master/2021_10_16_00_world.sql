@@ -1,4 +1,4 @@
-- Phasing
+-- Phasing
 DELETE FROM `phase_area` WHERE `AreaId` = 9359 AND `PhaseId` IN (10260, 10349, 9949);
 INSERT INTO `phase_area`(`AreaId`, `PhaseId`, `Comment`) VALUES
 (9359, 10260, 'Lightforged Draenai - Default Phase'),
