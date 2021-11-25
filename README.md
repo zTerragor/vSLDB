@@ -1,4 +1,4 @@
-# vS/LDB - BFA + Shadowkands Preservation project
+# vS/LDB - BFA + Shadowlands Preservation project
 BFA 8.3.7 + Shadowlands 9.1 
 
 Доброго времени суток, здесь мы собираемся реализовать наиболее полную базу данных  по BFA + Shadowlands 9.1
