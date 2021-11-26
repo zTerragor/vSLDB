@@ -7,6 +7,8 @@ BFA 8.3.7 + Shadowlands 9.1
 Good afternoon, here we are going to implement the most complete database on BFA + Shadowlands 9.1
 Interested and want to join us ? knock on the Discard: https://discord.gg/YxHEMm5Jk6
 
+![p1_2432152_3a9798e7](https://user-images.githubusercontent.com/81566364/143552265-0d32f236-4d10-4672-90d7-2c4b5a212389.jpg)
+
 
 Battle for Azeroth 8.3.7
 
@@ -86,3 +88,4 @@ Software requirements are available in the wiki for Windows, Linux and macOS.
 
 Install
 Detailed installation guides are available in the wiki for Windows, Linux and macOS.
+![battle-for-azeroth-key-art-100769684-large](https://user-images.githubusercontent.com/81566364/143552288-86fc8550-a0e0-4dfb-8528-9d051e89a6b0.jpg)
