@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 BfaCore
+ * Copyright (C) 2020 LOA Core
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -57,8 +57,8 @@ namespace fs = boost::filesystem;
 #if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
 #include "ServiceWin32.h"
 char serviceName[] = "bnetserver";
-char serviceLongName[] = "BfaCore bnet service";
-char serviceDescription[] = "BfaCore Battle.net emulator authentication service";
+char serviceLongName[] = "LOA Core bnet service";
+char serviceDescription[] = "LOA Core Battle.net emulator authentication service";
 /*
 * -1 - not in service mode
 *  0 - stopped
