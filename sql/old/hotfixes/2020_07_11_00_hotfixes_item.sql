@@ -51,3 +51,4 @@ REPLACE INTO item (`ID`, `IconFileDataID`, `ClassID`, `SubClassID`, `SoundOverri
 (@ITEMGUID, 1120721, 0, 0, 0, 0, 0, 0, 0, 0); 
 REPLACE INTO `item_effect` (`ID`, `SpellID`, `CoolDownMSec`, `CategoryCoolDownMSec`, `Charges`, `SpellCategoryID`, `ChrSpecializationID`, `LegacySlotIndex`, `TriggerType`, `ParentItemID`, `VerifiedBuild`) VALUES
 (@ITEMGUID,18282,0,0,0,0,0,0,0,@ITEMGUID,0);
+

@@ -1,5 +1,3 @@
-
-   
 -- MySQL dump 10.17  Distrib 10.3.15-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: world_8
