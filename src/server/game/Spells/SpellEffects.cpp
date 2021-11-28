@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 BfaCore
+ * Copyright (C) 2021 BfaCore Reforged
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -1887,25 +1887,27 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
         itemTarget->SetState(ITEM_CHANGED, itemTarget->GetOwner());
     }
 
-    // not allow use skill grow at item base open
-    if (!m_CastItem && skillId != SKILL_NONE)
-    {
-        // update skill if really known
-        if (uint32 pureSkillValue = player->GetPureSkillValue(skillId))
+    GameObjectTemplate const* goInfo = gameObjTarget->GetGOInfo();
+    if (goInfo->type == GAMEOBJECT_TYPE_GATHERING_NODE || goInfo->type == GAMEOBJECT_TYPE_CHEST)
+    {       
+        if (goInfo->IconName == "Herb")
         {
-            if (gameObjTarget)
-            {
-                // Allow one skill-up until respawned
-                if (!gameObjTarget->IsInSkillupList(player->GetGUID()) &&
-                    player->UpdateGatherSkill(skillId, pureSkillValue, reqSkillValue))
+            if (uint32 pureSkillValue = player->GetPureSkillValue(SKILL_HERBALISM_2) && gameObjTarget)
+                if (!gameObjTarget->IsInSkillupList(player->GetGUID()) && player->UpdateGatherSkill(SKILL_HERBALISM_2, pureSkillValue, reqSkillValue))
                     gameObjTarget->AddToSkillupList(player->GetGUID());
-            }
-            else if (itemTarget)
-            {
-                // Do one skill-up
-                player->UpdateGatherSkill(skillId, pureSkillValue, reqSkillValue);
-            }
         }
+        if (goInfo->IconName == "Mining")
+        {
+            if (uint32 pureSkillValue = player->GetPureSkillValue(SKILL_MINING_2) && gameObjTarget)
+                if (!gameObjTarget->IsInSkillupList(player->GetGUID()) && player->UpdateGatherSkill(SKILL_MINING_2, pureSkillValue, reqSkillValue))
+                    gameObjTarget->AddToSkillupList(player->GetGUID());
+        }
+    }
+
+    if (itemTarget)
+    {
+        if (uint32 pureSkillValue = player->GetPureSkillValue(skillId))
+            player->UpdateGatherSkill(skillId, pureSkillValue, reqSkillValue);
     }
     ExecuteLogEffectOpenLock(effIndex, gameObjTarget ? (Object*)gameObjTarget : (Object*)itemTarget);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 LOA Core
+ * Copyright (C) 2021 BfaCore Reforged
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -70,8 +70,8 @@ namespace fs = boost::filesystem;
 #ifdef _WIN32
 #include "ServiceWin32.h"
 char serviceName[] = "worldserver";
-char serviceLongName[] = "LOA Core world service";
-char serviceDescription[] = "LOA Core World of Warcraft emulator world service";
+char serviceLongName[] = "BfaCore world service";
+char serviceDescription[] = "BfaCore World of Warcraft emulator world service";
 /*
  * -1 - not in service mode
  *  0 - stopped
@@ -338,7 +338,7 @@ extern int main(int argc, char** argv)
         TC_LOG_INFO("server.worldserver", "Starting up anti-freeze thread (%u seconds max stuck time)...", coreStuckTime);
     }
 
-    TC_LOG_INFO("server.worldserver", "LOA Core official discord: https://discord.gg/T47zmDC5RD");
+    TC_LOG_INFO("server.worldserver", "BfaCore Reforged | bfacore.reforged@gmail.com");
     TC_LOG_INFO("server.worldserver", "%s (worldserver-daemon) ready...", GitRevision::GetFullVersion());
     
     sScriptMgr->OnStartup();

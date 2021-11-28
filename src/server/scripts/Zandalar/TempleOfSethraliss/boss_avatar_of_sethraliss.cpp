@@ -386,9 +386,9 @@ struct npc_hoodoo_hexer : public ScriptedAI
 };
 
 //137233
-struct npc_plague_toad : public ScriptedAI
+struct npc_plague_toad_137233 : public ScriptedAI
 {
-    npc_plague_toad(Creature* c) : ScriptedAI(c) { }
+    npc_plague_toad_137233(Creature* c) : ScriptedAI(c) { }
 
     void Reset() override
     {
@@ -429,6 +429,6 @@ void AddSC_boss_avatar_of_sethraliss()
 {
     RegisterCreatureAI(boss_avatar_of_sethraliss);
     RegisterCreatureAI(npc_hoodoo_hexer);
-    RegisterCreatureAI(npc_plague_toad);
+    RegisterCreatureAI(npc_plague_toad_137233);
     RegisterCreatureAI(npc_energy_fragment);
 }

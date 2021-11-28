@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 BfaCore
+ * Copyright (C) 2021 BfaCore Reforged
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -316,6 +316,7 @@ struct TC_GAME_API ScriptedAI : public CreatureAI
     //   - for raid in mode 10-Heroic
     //   - for raid in mode 25-heroic
     // DO NOT USE to check raid in mode 25-normal.
+    bool IsNormal() const { return _difficulty == DIFFICULTY_NORMAL || _difficulty == DIFFICULTY_NORMAL_RAID || _difficulty == DIFFICULTY_NORMAL_ISLAND || _difficulty == DIFFICULTY_NORMAL_WARFRONT; }
     bool IsHeroic() const { return _difficulty == DIFFICULTY_HEROIC || _difficulty == DIFFICULTY_HEROIC_RAID; }
 
     // return the dungeon or raid difficulty

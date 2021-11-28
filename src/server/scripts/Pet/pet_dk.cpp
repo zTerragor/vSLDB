@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 BfaCore
+ * Copyright (C) 2021 BfaCore Reforged
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -127,8 +127,29 @@ struct npc_pet_dk_guardian : public AggressorAI
     }
 };
 
+//51963
+class spell_dk_gargoyle_strike : public SpellScript
+{
+    PrepareSpellScript(spell_dk_gargoyle_strike);
+
+    void HandleOnHit()
+    {
+        if (Unit* owner = GetCaster()->GetOwner())
+        {
+            int32 damage = GetCaster()->GetOwner()->m_unitData->AttackPower / 100 * 15.0f;
+            SetHitDamage(damage);
+        }
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_dk_gargoyle_strike::HandleOnHit);
+    }
+};
+
 void AddSC_deathknight_pet_scripts()
 {
     new npc_pet_dk_ebon_gargoyle();
     RegisterCreatureAI(npc_pet_dk_guardian);
+    RegisterSpellScript(spell_dk_gargoyle_strike);
 }

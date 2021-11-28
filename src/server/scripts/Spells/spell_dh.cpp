@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 BfaCore
+ * Copyright (C) 2021 BfaCore Reforged
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -51,7 +51,7 @@ enum ProjectDemonHunterSpells
     SPELL_DH_FEL_RUSH_DASH                  = 197922,
     SPELL_DH_FEL_RUSH_AIR                   = 197923,
     SPELL_DH_FEL_RUSH                       = 195072,
-    //SPELL_DH_FEL_RUSH_DAMAGE                = 192611,
+    SPELL_DH_FEL_RUSH_DAMAGE                = 223107,
     SPELL_DH_EYE_BEAM                       = 198013,
     SPELL_DH_EYE_BEAM_VISUAL                = 194326,
     SPELL_DH_EYE_BEAM_DAMAGE                = 198030,
@@ -188,6 +188,11 @@ enum ShatteredSoulsSpells
     SPELL_DH_SHATTER_THE_SOULS              = 212827,
     SPELL_DH_FIERY_DEMISE_DEBUFF            = 212818,
     SPELL_DH_COVER_OF_DARKNESS              = 227635,
+    //8.0
+    SPELL_DH_SHATTERED_SOULS_HAVOC = 178940,
+    SPELL_DH_SHATTERED_SOULS_VENGEANCE =  204254,
+    SPELL_DH_MOMENTUM = 206476,
+    SPELL_DH_MOMENTUM_BUFF = 208628,
 };
 
 enum NemesisSpells
@@ -341,39 +346,8 @@ public:
     }
 };
 
-// Felblade aura - 203557
-class spell_dh_felblade : public SpellScriptLoader
-{
-public:
-    spell_dh_felblade() : SpellScriptLoader("spell_dh_felblade") {}
-
-    class spell_dh_felblade_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_dh_felblade_AuraScript);
-
-        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
-        {
-            Unit* caster = GetCaster();
-            if (!caster)
-                return;
-
-            caster->GetSpellHistory()->ResetCooldown(SPELL_DH_FELBLADE, true);
-        }
-
-        void Register() override
-        {
-            OnEffectProc += AuraEffectProcFn(spell_dh_felblade_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_dh_felblade_AuraScript();
-    }
-};
-
 // Vengeful Retread Damage - 198813
-/*class spell_dh_vengeful_retreat_damage : public SpellScriptLoader
+class spell_dh_vengeful_retreat_damage : public SpellScriptLoader
 {
 public:
     spell_dh_vengeful_retreat_damage() : SpellScriptLoader("spell_dh_vengeful_retreat_damage") {}
@@ -421,7 +395,7 @@ public:
         void Register() override
         {
             OnCast += SpellCastFn(spell_dh_vengeful_retreat_damage_SpellScript::HandleCast);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dh_vengeful_retreat_damage_SpellScript::CountTargets, EFFECT_2, TARGET_UNIT_SRC_AREA_ENEMY);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dh_vengeful_retreat_damage_SpellScript::CountTargets, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED);
         }
     };
 
@@ -430,68 +404,63 @@ public:
         return new spell_dh_vengeful_retreat_damage_SpellScript();
     }
 };
-*/
 
-// Fel Rush Damage - 192611
-/*class spell_dh_fel_rush_damage : public SpellScriptLoader
+// Fel Rush Damage - 223107
+class spell_dh_fel_rush_damage : public SpellScript
 {
-public:
-    spell_dh_fel_rush_damage() : SpellScriptLoader("spell_dh_fel_rush_damage") {}
+    PrepareSpellScript(spell_dh_fel_rush_damage);
 
-    class spell_dh_fel_rush_damage_SpellScript : public SpellScript
+    bool targetHit;
+
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_dh_fel_rush_damage_SpellScript);
+        targets.remove(GetCaster());
+    }
 
-        bool targetHit;
+    void CountTargets(std::list<WorldObject*>& targets)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
 
-        bool Validate(SpellInfo const*) override
+        targets.clear();
+        std::list<Unit*> units;
+        caster->GetAttackableUnitListInRange(units, 25.f);
+        units.remove_if([caster](Unit* unit)
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DH_FEL_MASTERY_FURY))
-                return false;
+            return !caster->HasInLine(unit, 6.f, caster->GetObjectScale());
+        });
 
-            return true;
-        }
-
-        void CountTargets(std::list<WorldObject*>& targets)
-        {
-            Unit* caster = GetCaster();
-            if (!caster)
-                return;
-
-            targets.clear();
-            std::list<Unit*> units;
-            caster->GetAttackableUnitListInRange(units, 25.f);
-            units.remove_if([caster](Unit* unit)
-            {
-                return !caster->HasInLine(unit, 6.f, caster->GetObjectScale());
-            });
-
-            for (Unit* unit : units)
+        for (Unit* unit : units)
                 targets.push_back(unit);
 
-            targetHit = !targets.empty();
-        }
+        targetHit = !targets.empty();
+    }
 
-        void HandleCast()
-        {
-            if (Unit* caster = GetCaster())
-                if (caster->HasAura(SPELL_DH_FEL_MASTERY) && targetHit)
-                    caster->CastSpell(caster, SPELL_DH_FEL_MASTERY_FURY, true);
-        }
-
-        void Register() override
-        {
-            OnCast += SpellCastFn(spell_dh_fel_rush_damage_SpellScript::HandleCast);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dh_fel_rush_damage_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_LINE_ENEMY_134);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleCast()
     {
-        return new spell_dh_fel_rush_damage_SpellScript();
+        if (Unit* caster = GetCaster())
+            if (caster->HasAura(SPELL_DH_FEL_MASTERY) && targetHit)
+                caster->CastSpell(caster, SPELL_DH_FEL_MASTERY_FURY, true);
+    }
+
+    void HandleOnHit()
+    {
+        if (GetCaster() && GetHitUnit())
+        {
+            int32 attackPower = GetCaster()->m_unitData->AttackPower / 100 * 25.3f;
+            SetHitDamage(attackPower);        
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dh_fel_rush_damage::FilterTargets, EFFECT_0, TARGET_UNIT_CONE_ENTRY_129);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dh_fel_rush_damage::CountTargets, EFFECT_0, TARGET_UNIT_CONE_ENTRY_129);
+        OnCast += SpellCastFn(spell_dh_fel_rush_damage::HandleCast);
+        OnHit += SpellHitFn(spell_dh_fel_rush_damage::HandleOnHit);
     }
 };
-*/
 
 // Metamorphosis (Havoc) - 191427
 class spell_dh_metamorphosis : public SpellScriptLoader
@@ -704,10 +673,12 @@ public:
                 {
                     caster->RemoveAurasDueToSpell(SPELL_DH_GLIDE);
                     caster->CastSpell(caster, SPELL_DH_FEL_RUSH_DASH, true);
-                    //caster->CastSpell(caster, SPELL_DH_FEL_RUSH_DAMAGE, true);
-
-                    caster->GetSpellHistory()->AddCooldown(GetSpellInfo()->Id, 0, std::chrono::milliseconds(750));
+                    if (GetHitUnit())
+                        caster->CastSpell(GetHitUnit(), SPELL_DH_FEL_RUSH_DAMAGE, true);
+                    if (caster->HasAura(SPELL_DH_MOMENTUM))
+                        caster->CastSpell(nullptr, SPELL_DH_MOMENTUM_BUFF, true);
                 }
+                caster->GetSpellHistory()->AddCooldown(GetSpellInfo()->Id, 0, std::chrono::milliseconds(750));
             }
         }
 
@@ -719,7 +690,10 @@ public:
                     caster->RemoveAurasDueToSpell(SPELL_DH_GLIDE);
                     caster->SetDisableGravity(true);
                     caster->CastSpell(caster, SPELL_DH_FEL_RUSH_AIR, true);
-                    //caster->CastSpell(caster, SPELL_DH_FEL_RUSH_DAMAGE, true);
+                    if (GetHitUnit())
+                        caster->CastSpell(GetHitUnit(), SPELL_DH_FEL_RUSH_DAMAGE, true);
+                    if (caster->HasAura(SPELL_DH_MOMENTUM))
+                        caster->CastSpell(nullptr, SPELL_DH_MOMENTUM_BUFF, true);
 
                     caster->GetSpellHistory()->AddCooldown(GetSpellInfo()->Id, 0, std::chrono::milliseconds(750));
                 }
@@ -1547,62 +1521,30 @@ public:
     }
 };
 
-// Fiery Brand dot - 207771
-class spell_dh_fiery_brand_dot : public SpellScriptLoader
+//207771
+class spell_dh_fiery_brand_dot : public AuraScript
 {
-public:
-    spell_dh_fiery_brand_dot() : SpellScriptLoader("spell_dh_fiery_brand_dot") {}
+    PrepareAuraScript(spell_dh_fiery_brand_dot);
 
-    class spell_dh_fiery_brand_dot_AuraScript : public AuraScript
+private:
+    std::list<Unit*> uList;
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_dh_fiery_brand_dot_AuraScript);
+        if (!GetCaster() || !GetCaster()->GetAura(SPELL_DH_BURNING_ALIVE))
+            return;
 
-        void HandlePeriodic(AuraEffect const* aurEff)
+        GetTarget()->GetAnyUnitListInRange(uList, 8.f);
+        for (auto& targets : uList)
         {
-            Unit* caster = aurEff->GetCaster();
-            if (!caster->HasAura(SPELL_DH_BURNING_ALIVE))
-            {
-                PreventDefaultAction();
-                return;
-            }
-
-            Unit* owner = GetUnitOwner();
-            if (!owner)
-                return;
-
-            if (Aura* burningAlive = caster->GetAura(SPELL_DH_BURNING_ALIVE))
-            {
-                ObjectGuid const originalTarget = burningAlive->Variables.GetValue<ObjectGuid>("TargetGuid", ObjectGuid::Empty);
-                if (!originalTarget.IsEmpty())
-                    return;
-
-                if (owner == ObjectAccessor::GetUnit(*caster, originalTarget))
-                {
-                    std::list<Unit*> nearbyUnits;
-                    caster->GetAttackableUnitListInRange(nearbyUnits, 8.f);
-
-                    for (Unit* unit : nearbyUnits)
-                    {
-                        if (unit->HasAura(SPELL_DH_FIERY_BRAND_DOT))
-                            continue;
-
-                        caster->CastSpell(unit, SPELL_DH_FIERY_BRAND_DOT, true);
-                        burningAlive->RefreshDuration();
-                        return;
-                    }
-                }
-            }
+            if (!targets->HasAura(SPELL_DH_FIERY_BRAND_DOT) && !GetCaster()->IsFriendlyTo(targets))
+                GetCaster()->CastSpell(targets, SPELL_DH_FIERY_BRAND_DOT, true);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_dh_fiery_brand_dot_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_dh_fiery_brand_dot_AuraScript();
+        OnEffectApply += AuraEffectApplyFn(spell_dh_fiery_brand_dot::OnApply, EFFECT_2, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -2981,45 +2923,6 @@ class spell_dh_immolation_aura_initial : public SpellScriptLoader
         }
 };
 
-// 232893 - Felblade dummy
-class spell_dh_felblade_dummy : public SpellScriptLoader
-{
-    public:
-        spell_dh_felblade_dummy() : SpellScriptLoader("spell_dh_felblade_dummy") { }
-
-        class spell_dh_felblade_dummy_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_dh_felblade_dummy_SpellScript);
-
-            void HandleHit(SpellEffIndex /*effIndex*/)
-            {
-                Unit* caster = GetCaster();
-                Unit* target = GetHitUnit();
-                if (!caster || !target || !caster->ToPlayer())
-                    return;
-
-                caster->CastSpell(target, SPELL_DH_FELBLADE_CHARGE, true);
-
-                ObjectGuid targetGUID = target->GetGUID();
-                caster->GetScheduler().Schedule(500ms, [caster, targetGUID](TaskContext /*context*/)
-                {
-                    if (Unit* target = ObjectAccessor::GetUnit(*caster, targetGUID))
-                        caster->CastSpell(target, SPELL_DH_FELBLADE_DAMAGE, true);
-                });
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_dh_felblade_dummy_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_dh_felblade_dummy_SpellScript();
-        }
-};
-
 // 209795 - Fracture
 class spell_dh_fracture : public SpellScriptLoader
 {
@@ -3864,9 +3767,9 @@ public:
                 damage += (100.f - powerPct) / 10.f * GetSpellInfo()->GetEffect(EFFECT_2)->BasePoints;
             }
 
-            damage = std::min(damage, GetSpellInfo()->GetEffect(EFFECT_3)->BasePoints);
+            damage = std::max<uint32>(GetHitUnit()->CountPctFromMaxHealth(int32(5)), 1);
 
-            SetEffectValue(damage);
+            SetHitDamage(damage);
         }
 
         void Register() override
@@ -3989,29 +3892,6 @@ class spell_dh_demon_spikes : public SpellScript
     }
 };
 
-//268178
-class aura_void_reaver : public AuraScript
-{
-    PrepareAuraScript(aura_void_reaver);
-
-    void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-    {
-        Unit* caster = GetCaster();
-        Unit* target = GetTarget();
-        if (!caster || !target)
-            return;
-
-        target->RemoveAurasDueToSpell(268178, ObjectGuid::Empty, 0, AURA_REMOVE_BY_DEFAULT);
-        int32 basePoints = GetSpellInfo()->GetEffect(EFFECT_0)->BasePoints;        
-        caster->CastSpell(target, basePoints, true);
-    }
-
-    void Register()
-    {       
-        OnEffectApply += AuraEffectApplyFn(aura_void_reaver::OnApply, EFFECT_0, SPELL_AURA_MOD_IGNORE_TARGET_RESIST, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
 class dh_shattered_souls : public PlayerScript
 {
 public:
@@ -4019,30 +3899,23 @@ public:
 
     void OnCreatureKill(Player* player, Creature* victim) override
     {
-        if (player->getClass() != CLASS_DEMON_HUNTER && !player->HasAura(178940))
+        if (player->getClass() != CLASS_DEMON_HUNTER)
             return;
 
-        if (!player || !victim)
-            return;
+        Position fragmentPos = victim->GetRandomNearPosition(5.0f);
 
-        if (victim->GetCreatureType() == CREATURE_TYPE_DEMON)
+        if (victim->GetCreatureType() == CREATURE_TYPE_DEMON && roll_chance_f(30))
         {
-            if (roll_chance_f(15))
-            {
-                player->CastCustomSpell(SPELL_DH_SHATTERED_SOULS_MISSILE, SPELLVALUE_BASE_POINT0, SPELL_DH_SHATTERED_SOULS_DEMON, player, true);
-                player->CastSpell(nullptr, SPELL_DH_SOUL_FRAGMENT_DEMON_BONUS, true);
-            }
-        }
-        if (victim->GetCreatureType() != CREATURE_TYPE_DEMON)
-        {
-            if (roll_chance_f(15))
-                player->CastCustomSpell(SPELL_DH_SHATTERED_SOULS_MISSILE, SPELLVALUE_BASE_POINT0, SPELL_DH_SHATTERED_SOULS, player, true);
+            //player->CastSpell(nullptr, SPELL_DH_SHATTERED_SOULS_MISSILE, true);
+            victim->CastSpell(nullptr, SPELL_DH_SHATTERED_SOULS_DEMON, true); //at
+            player->CastSpell(nullptr, SPELL_DH_SOUL_FRAGMENT_DEMON_BONUS, true); //buff
         }
 
-        if (player->GetSpecializationId() == TALENT_SPEC_DEMON_HUNTER_HAVOC)
-            player->CastSpell(nullptr, SPELL_DH_SOUL_FRAGMENT_HEAL_25_HAVOC, true);
-        else   
-            player->CastSpell(nullptr, SPELL_DH_SOUL_FRAGMENT_HEAL_VENGEANCE, true);
+        if (victim->GetCreatureType() != CREATURE_TYPE_DEMON && roll_chance_f(30))
+        {
+            //victim->CastSpell(nullptr, SPELL_DH_SHATTERED_SOULS_MISSILE, true);
+            player->CastSpell(fragmentPos, SPELL_DH_SHATTERED_SOULS, true); //10665
+        }
 
         if (player->HasAura(SPELL_DH_FEED_THE_DEMON))
             player->GetSpellHistory()->ReduceChargeCooldown(sSpellMgr->GetSpellInfo(SPELL_DH_DEMON_SPIKES)->ChargeCategoryId, 1000);
@@ -4087,6 +3960,56 @@ class spell_dh_annihilation : public SpellScript
     }
 };
 
+//204255 normal, at 10665, 204256 demon, at 10666
+struct at_shattered_soul_fragment : AreaTriggerAI
+{
+    at_shattered_soul_fragment(AreaTrigger* areatrigger) : AreaTriggerAI(areatrigger) { }
+
+    void OnUnitEnter(Unit* unit) override
+    {
+        if (unit != at->GetCaster() || !unit->IsPlayer() || unit->ToPlayer()->getClass() != CLASS_DEMON_HUNTER)
+            return;
+
+        switch (at->GetEntry())
+        {
+        case 10665:
+            if (at->GetCaster()->ToPlayer()->GetSpecializationId() == TALENT_SPEC_DEMON_HUNTER_HAVOC)
+                at->GetCaster()->CastSpell(at->GetCaster(), SPELL_DH_SOUL_FRAGMENT_HEAL_25_HAVOC, true);
+            at->Remove();
+            break;
+
+        case 10666:
+            if (at->GetCaster()->ToPlayer()->GetSpecializationId() == TALENT_SPEC_DEMON_HUNTER_HAVOC)
+                at->GetCaster()->CastSpell(at->GetCaster(), SPELL_DH_SOUL_FRAGMENT_HEAL_25_HAVOC, true);
+            at->Remove();
+            break;
+        }
+    }
+};
+
+//232893
+class spell_dh_felblade : public SpellScript
+{
+    PrepareSpellScript(spell_dh_felblade);
+
+    void HandleOnHit(SpellEffIndex /*effIndex*/)
+    {
+        if (!GetCaster() || !GetHitUnit())
+            return;
+
+        if (GetCaster()->GetDistance2d(GetHitUnit()) <= 15.0f)
+        {
+            GetCaster()->CastSpell(GetHitUnit(), SPELL_DH_FELBLADE_CHARGE, true);
+            GetCaster()->CastSpell(GetHitUnit(), SPELL_DH_FELBLADE_DAMAGE, true);
+        }
+    }
+
+    void Register()
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_dh_felblade::HandleOnHit, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_demon_hunter_spell_scripts()
 {
     new spell_dh_fel_rush();
@@ -4100,9 +4023,8 @@ void AddSC_demon_hunter_spell_scripts()
     new spell_dh_last_resort();
     new spell_dh_metamorphosis();
     new spell_dh_metamorphosis_immunity();
-    //new spell_dh_fel_rush_damage();
-    //new spell_dh_vengeful_retreat_damage();
-    new spell_dh_felblade();
+    RegisterSpellScript(spell_dh_fel_rush_damage);
+    new spell_dh_vengeful_retreat_damage();
     new spell_dh_first_blood();
     new spell_dh_bloodlet();
     new spell_dh_fel_barrage();
@@ -4114,7 +4036,7 @@ void AddSC_demon_hunter_spell_scripts()
     RegisterSpellScript(spell_dh_soul_cleave_damage);
     new spell_dh_fiery_brand();
     new spell_dh_fiery_brand_absorb();
-    new spell_dh_fiery_brand_dot();
+    RegisterAuraScript(spell_dh_fiery_brand_dot);
     new spell_dh_razor_spikes();
     new spell_dh_soul_barrier();
     new spell_dh_nether_bond();
@@ -4142,7 +4064,6 @@ void AddSC_demon_hunter_spell_scripts()
     new spell_dh_chaos_cleave();
     new spell_dh_desperate_instincts();
     new spell_dh_immolation_aura_initial();
-    new spell_dh_felblade_dummy();
     new spell_dh_fracture();
     new spell_dh_fel_devastation();
     new spell_dh_frailty();
@@ -4175,7 +4096,8 @@ void AddSC_demon_hunter_spell_scripts()
     RegisterAreaTriggerAI(at_dh_artifact_inner_demons);
     RegisterAreaTriggerAI(at_demon_hunter_mana_rift);
     RegisterAreaTriggerAI(at_demon_hunter_demonic_trample);
-    RegisterAuraScript(aura_void_reaver);
     RegisterPlayerScript(dh_shattered_souls);
     RegisterSpellScript(spell_dh_annihilation);
+    RegisterAreaTriggerAI(at_shattered_soul_fragment);
+    RegisterSpellScript(spell_dh_felblade);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 BfaCore
+ * Copyright (C) 2021 BfaCore Reforged
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -128,14 +128,33 @@ void InstanceScript::OnCreatureCreate(Creature* creature)
     AddObject(creature, true);
     AddMinion(creature, true);
 
+    //It's modified on purpose, do not change it
     Difficulty difficulty = instance->GetDifficultyID();
     if (difficulty != DIFFICULTY_NONE)
         if (InstanceDifficultyMultiplier const* multiplier = sObjectMgr->GetInstanceDifficultyMultiplier(instance->GetId(), difficulty))
-            creature->SetBaseHealth(creature->GetMaxHealth() * multiplier->healthMultiplier);
+            switch (creature->GetMapId())
+            {
+            case MAP_ULDIR:
+            case MAP_CRUCIBLE_OF_STORMS:
+            case MAP_BATTLE_OF_DAZARALOR:
+            case MAP_ETERNAL_PALACE:
+            case MAP_NYALOTHA:
+                if (creature->getLevel() != 123) // Handle trash here
+                    if (CreatureTemplate const* cTemp = sObjectMgr->GetCreatureTemplate(creature->GetEntry()))
+                    {
+                        if (cTemp->ModHealth == 1)
+                            creature->SetBaseHealth(creature->GetMaxHealth() * multiplier->healthMultiplier);
+                    }
+                break;
+            }
 
     if (IsChallengeModeStarted())
         if (!creature->IsPet())
             CastChallengeCreatureSpell(creature);
+
+    //Only for BFA raids and their bosses, following method isn't implemented, so if anyone have idea how to scale bosses properly, let me know
+    //I calculated numbers for specific raid difficulties in past...
+    //SetRaidBossScaling(creature);
 }
 
 void InstanceScript::OnCreatureRemove(Creature* creature)
@@ -192,6 +211,9 @@ GameObject* InstanceScript::GetGameObject(uint32 type)
 
 void InstanceScript::OnPlayerEnter(Player* player)
 {
+    if (player->IsMounted())
+        player->Dismount();
+    //exceptions here
     if (IsChallengeModeStarted())
     {
         WorldPackets::ChallengeMode::ChangePlayerDifficultyResult changePlayerDifficultyResult(11);

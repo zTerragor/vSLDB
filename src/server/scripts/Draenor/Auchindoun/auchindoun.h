@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2020 BfaCore
+ * Copyright (C) 2021 BfaCore Reforged
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -349,7 +349,7 @@ enum eAuchindounCreatures
     CreatureSargereiMagus = 76263,
     CreatureSargeriRitualist = 77130,
     CreatureSargeriMagus = 77694,
-    CreatureSargeriZealot = 77950,
+    CreatureSargeriZealot = 77132,
     CreatureSargeriWarden = 77935,
     CreatureSargereiDefender = 77042,
     CreatureSargereiAssasinating = 87073,
