@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 BfaCore
+ * Copyright (C) 2021 BfaCore Reforged
  * 
  *
  * This program is free software; you can redistribute it and/or modify it

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 BfaCore
+ * Copyright (C) 2021 BfaCore Reforged
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -198,7 +198,15 @@ enum QuestFlagsEx : uint32
     QUEST_FLAGS_EX_REMOVE_QUEST_ON_WEEKLY_RESET                         = 0x0200000,
     QUEST_FLAGS_EX_SUPPRESS_FAREWELL_AUDIO_AFTER_QUEST_ACCEPT           = 0x0400000,
     QUEST_FLAGS_EX_REWARDS_BYPASS_WEEKLY_CAPS_AND_SEASON_TOTAL          = 0x0800000,
-    QUEST_FLAGS_EX_CLEAR_PROGRESS_OF_CRITERIA_TREE_OBJECTIVES_ON_ACCEPT = 0x1000000
+    QUEST_FLAGS_EX_CLEAR_PROGRESS_OF_CRITERIA_TREE_OBJECTIVES_ON_ACCEPT = 0x1000000,
+    QUEST_FLAGS_EX_IS_WORLD_QUEST                                       = 0x01000000,
+    QUEST_FLAGS_EX_NOT_IGNORABLE                                        = 0x02000000,
+    QUEST_FLAGS_EX_AUTO_PUSH                                            = 0x04000000,
+    QUEST_FLAGS_EX_NO_SPELL_COMPLETE_EFFECTS                            = 0x08000000,
+    QUEST_FLAGS_EX_DO_NOT_TOAST_HONOR_REWARD                            = 0x10000000,
+    QUEST_FLAGS_EX_KEEP_REPEATABLE_QUEST_ON_FACTION_CHANGE              = 0x20000000,
+    QUEST_FLAGS_EX_KEEP_PROGRESS_ON_FACTION_CHANGE                      = 0x40000000,
+    QUEST_FLAGS_EX_PUSH_TEAM_QUEST_USING_MAP_CONTROLLER                 = 0x80000000
 };
 
 enum QuestFlagsEx2 : uint32

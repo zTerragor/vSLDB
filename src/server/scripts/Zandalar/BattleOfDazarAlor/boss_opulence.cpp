@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2020 BfaCore
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
 #include "ScriptMgr.h"
 #include "Creature.h"
 #include "CreatureAI.h"
@@ -24,11 +8,14 @@
 #include "AreaTrigger.h"
 #include "AreaTriggerAI.h"
 #include "battle_of_dazaralor.h"
-// ||
 
 enum Texts
 {
-
+    SAY_GALLYWIX_OPULENCE_AGGRO = 0,
+    SAY_GALLYWIX_STAGE_TWO_BEGINS = 2,
+    SAY_GALLYWIX_STAGE_TWO_BEGINS_1 = 1,
+    SAY_GALLYWIX_KILL = 3,
+    SAY_GALLYWIX_DEATH = 4,
 };
 
 enum Spells
@@ -42,7 +29,7 @@ enum Spells
     FOCUSED_ANIMUS_AURA = 284614,
     GREED_AURA = 284943,
     LIQUID_GOLD_AURA = 287072,
-    LIQUID_GOLD_AT = 287073,
+    LIQUID_GOLD_CREATE_AT = 287073,
     LIQUID_GOLD_AT_DAMAGE = 287074,
     SPIRITS_OF_GOLD = 285995,
     SURGING_GOLD = 289155,
@@ -75,10 +62,17 @@ struct boss_opulence : public BossAI
         me->SetPowerType(POWER_ENERGY);
         me->RemoveAura(PERIODIC_ENERGY_GAIN);
         me->SetPower(POWER_ENERGY, 0);
-        me->DespawnCreaturesInArea(NPC_SPIRIT_OF_GOLD, 125.0f);        
+        me->AddAura(AURA_OVERRIDE_POWER_COLOR_PURPLE);
+        me->DespawnCreaturesInArea(NPC_SPIRIT_OF_GOLD, 125.0f);
         me->NearTeleportTo(me->GetHomePosition());
         _JustReachedHome();
         engaged = false;
+        me->SetReactState(REACT_AGGRESSIVE);
+        /*if (!engaged)
+        {
+            me->AddUnitFlag(UnitFlags(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE));
+            me->SetReactState(REACT_PASSIVE);
+        }*/
     }
 
     void AttackStart(Unit* who) override
@@ -91,9 +85,20 @@ struct boss_opulence : public BossAI
 
     void EnterCombat(Unit* /*unit*/) override
     {
-        _EnterCombat();
-        engaged = true;
+        _EnterCombat();        
         DoCast(PERIODIC_ENERGY_GAIN);
+        if (Creature* gallywix = me->FindNearestCreature(NPC_TRADE_PRINCE_GALLYWIX, 100.0f, true))
+        {
+            gallywix->AI()->Talk(SAY_GALLYWIX_STAGE_TWO_BEGINS);
+            gallywix->GetScheduler().Schedule(7s, [this, gallywix] (TaskContext context)
+            {
+                gallywix->AI()->Talk(SAY_GALLYWIX_STAGE_TWO_BEGINS_1);
+
+            }).Schedule(20s, [this, gallywix](TaskContext context)
+            {
+                gallywix->AI()->Talk(SAY_GALLYWIX_OPULENCE_AGGRO);
+            });
+        }
         events.ScheduleEvent(EVENT_HOARD_POWER, 1s);
         events.ScheduleEvent(EVENT_COIN_SWEEP, 7s);
         events.ScheduleEvent(EVENT_LIQUID_GOLD, 12s);
@@ -104,18 +109,12 @@ struct boss_opulence : public BossAI
 
     void OnSpellFinished(SpellInfo const* spellInfo) override
     {
-        if (spellInfo->Id == HOARD_POWER)
-        {
+        if (spellInfo->Id == HOARD_POWER)        
             return;
-        }
-        if (spellInfo->Id == SPIRITS_OF_GOLD)
+
+        if (spellInfo->Id == SPIRITS_OF_GOLD)        
         {
-            me->SummonCreature(NPC_SPIRIT_OF_GOLD, me->GetPosition());
-            me->SummonCreature(NPC_SPIRIT_OF_GOLD, me->GetPosition());
-            me->SummonCreature(NPC_SPIRIT_OF_GOLD, me->GetPosition());
-            me->SummonCreature(NPC_SPIRIT_OF_GOLD, me->GetPosition());
-            me->SummonCreature(NPC_SPIRIT_OF_GOLD, me->GetPosition());
-            me->SummonCreature(NPC_SPIRIT_OF_GOLD, me->GetPosition());
+            for (uint8 i = 0; i < 8; i++)
             me->SummonCreature(NPC_SPIRIT_OF_GOLD, me->GetPosition());
         }
     }
@@ -130,13 +129,33 @@ struct boss_opulence : public BossAI
         }
     }
 
+    void KilledUnit(Unit* unit) override
+    {
+        if (unit->IsPlayer())
+            if (roll_chance_f(15))
+                if (Creature* gallywix = me->FindNearestCreature(NPC_TRADE_PRINCE_GALLYWIX, 100.0f, true))
+                    gallywix->AI()->Talk(SAY_GALLYWIX_KILL);
+    }
+
+    void JustDied(Unit* unit) override
+    {
+        _JustDied();
+        me->DespawnCreaturesInArea(NPC_SPIRIT_OF_GOLD, 125.0f);
+        if (IsMythic())
+            instance->DoCompleteAchievement(13299);
+
+        if (Creature* gallywix = me->FindNearestCreature(NPC_TRADE_PRINCE_GALLYWIX, 100.0f, true))
+            gallywix->AI()->Talk(SAY_GALLYWIX_DEATH);
+    }
+
     void EnterEvadeMode(EvadeReason /*why*/) override 
     { 
-        if (instance->IsWipe() && engaged == true)
+        if (instance->IsWipe())
         {
             me->DespawnCreaturesInArea(NPC_SPIRIT_OF_GOLD, 125.0f);
-            me->ForcedDespawn(100, 3s);
+            me->ForcedDespawn(100, 3s);            
         }
+        engaged = true;
     }
 
     void ExecuteEvent(uint32 eventId) override
@@ -191,7 +210,7 @@ struct boss_opulence : public BossAI
         }
     }
     private:
-    bool engaged = true;
+    bool engaged;
 };
 
 void AddSC_boss_opulence()

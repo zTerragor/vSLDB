@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 BfaCore
+ * Copyright (C) 2021 BfaCore Reforged
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -1362,7 +1362,6 @@ class TC_GAME_API ObjectMgr
 
 
         void LoadTrainers();
-        void LoadCreatureTrainers();
 
         void LoadCreatureSummonerEntry();
 

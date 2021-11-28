@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 BfaCore
+ * Copyright (C) 2021 BfaCore Reforged
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -1411,6 +1411,12 @@ void World::LoadConfigSettings(bool reload)
         m_timers[WUPDATE_AUTOBROADCAST].Reset();
     }
 
+    // Autorestarter
+    m_int_configs[CONFIG_AUTORESTART_TIMER] = sConfigMgr->GetIntDefault("Autorestart.Timer", 0);
+
+    if (m_int_configs[CONFIG_AUTORESTART_TIMER] < 0)
+        m_int_configs[CONFIG_AUTORESTART_TIMER] = 0;
+
     // MySQL ping time interval
     m_int_configs[CONFIG_DB_PING_INTERVAL] = sConfigMgr->GetIntDefault("MaxPingTime", 30);
 
@@ -2007,9 +2013,6 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Gossip menu options...");
     sObjectMgr->LoadGossipMenuItems();
 
-    TC_LOG_INFO("server.loading", "Loading Creature trainers...");
-    sObjectMgr->LoadCreatureTrainers();                         // must be after LoadGossipMenuItems
-
     TC_LOG_INFO("server.loading", "Loading Vendors...");
     sObjectMgr->LoadVendors();                                  // must be after load CreatureTemplate and ItemTemplate
 
@@ -2289,6 +2292,10 @@ void World::SetInitialWorldSettings()
     TC_METRIC_EVENT("events", "World initialized", "World initialized in " + std::to_string(startupDuration / 60000) + " minutes " + std::to_string((startupDuration % 60000) / 1000) + " seconds");
 
     sLog->SetRealmId(realm.Id.Realm);
+
+    // Auto restarter
+    if (sWorld->getIntConfig(CONFIG_AUTORESTART_TIMER) != 0)
+	    sWorld->ShutdownServ(sWorld->getIntConfig(CONFIG_AUTORESTART_TIMER), SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE);
 }
 
 void World::LoadAutobroadcasts()

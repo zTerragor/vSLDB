@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 BfaCore
+ * Copyright 2021 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -39,31 +39,6 @@ struct instance_uldir : public InstanceScript
     {
         LoadDoorData(doorData);
     }
-
-	void OnCreatureCreate(Creature* cre) override
-	{
-        if (CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(cre->GetEntry()))
-        {
-            if (cInfo->MechanicImmuneMask == 0)
-            {
-                if (instance->IsMythic())
-                    if (cre->getFaction() == 16)
-                        cre->SetBaseHealth(cre->GetMaxHealth() * 3.0f);
-
-                if (instance->IsHeroic())
-                    if (cre->getFaction() == 16)
-                        cre->SetBaseHealth(cre->GetMaxHealth() * 6.0f);
-
-                 else
-                    if (cre->getFaction() == 16)
-                        cre->SetBaseHealth(cre->GetMaxHealth() * 9.8f);
-            }
-            if (cInfo->rank == 3)
-            {
-                cre->SetBaseHealth(cre->GetMaxHealth() * 4.5f);
-            }
-        }
-	}
 
     void OnGameObjectCreate(GameObject* go) override
     {

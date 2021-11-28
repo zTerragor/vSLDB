@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 BfaCore
+ * Copyright (C) 2021 BfaCore Reforged
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -5688,9 +5688,9 @@ bool Player::UpdateFishingSkill()
 {
     TC_LOG_DEBUG("entities.player.skills", "Player::UpdateFishingSkill: Player '%s' (%s)", GetName().c_str(), GetGUID().ToString().c_str());
 
-    uint32 SkillValue = GetPureSkillValue(SKILL_FISHING);
+    uint32 SkillValue = GetPureSkillValue(SKILL_FISHING_2);
 
-    if (SkillValue >= GetMaxSkillValue(SKILL_FISHING))
+    if (SkillValue >= GetMaxSkillValue(SKILL_FISHING_2))
         return false;
 
     uint8 stepsNeededToLevelUp = GetFishingStepsNeededToLevelUp(SkillValue);
@@ -5701,7 +5701,7 @@ bool Player::UpdateFishingSkill()
         m_fishingSteps = 0;
 
         uint32 gathering_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING);
-        return UpdateSkillPro(SKILL_FISHING, 100*10, gathering_skill_gain);
+        return UpdateSkillPro(SKILL_FISHING_2, 100*10, gathering_skill_gain);
     }
 
     return false;
@@ -27991,18 +27991,14 @@ bool Player::AddPvpTalent(PvpTalentEntry const* talent, uint8 activeTalentGroup,
         return false;
     }
 
-    //Temporary fix, warmode is supposed to turn on PvP, that's not happening also
-    if (this->GetAreaId() == 5148 || this->GetAreaId() == 5170)
+    //IsInWarMode();
+    if (this->HasPlayerFlag(PLAYER_FLAGS_RESTING))
     {
         LearnSpell(talent->SpellID, false);
         //Enlisted
         if (!this->HasAura(269083))
             this->AddAura(269083);
     }
-
-    //It can't pass this bool, PLAYER_FLAGS_WAR_MODE_DESIRED is never added
-    /*if (IsInWarMode())
-        LearnSpell(talent->SpellID, false);*/
 
     // Move this to toggle ?
     if (talent->OverridesSpellID)

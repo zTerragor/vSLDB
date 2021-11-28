@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 BfaCore
+ * Copyright (C) 2021 BfaCore Reforged
  *
  * This SourceCode is NOT free a software. Please hold everything Private
  * and read our Terms
