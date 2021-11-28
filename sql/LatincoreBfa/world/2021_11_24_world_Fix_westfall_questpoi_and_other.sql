@@ -1,11 +1,4 @@
-@@ -0,0 +1,60 @@
-/*
-**************************
-*    BfaCore Reforged    *
-**************************
-*/
 
--- Westfall
 
 -- Quest POI
 DELETE FROM `quest_poi` WHERE `QuestID` = '26266'; 
