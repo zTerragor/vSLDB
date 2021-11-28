@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -150,13 +150,6 @@ enum HunterSpells
     SPELL_HUNTER_AURA_SHOOTING = 224729,
     SPELL_HUNTER_AIMED_SHOT = 19434,
     SPELL_HUNTER_GLYPH_OF_MISDIRECTION = 56829,
-    //8.0
-    SPELL_HUNTER_SCORCHING_WILDFIRE = 259496,
-    SPELL_HUNTER_RAPID_FIRE = 257044,
-    SPELL_HUNTER_RAPID_FIRE_MISSILE = 257045,
-    SPELL_HUNTER_LETHAL_SHOTS = 260393,
-    SPELL_HUNTER_CALLING_THE_SHOTS = 260404,
-    SPELL_HUNTER_TRUESHOT = 288613,
 
 };
 
@@ -1073,7 +1066,7 @@ public:
 
             // (1.5 * (rap * 3) * bmMastery * lowNerf * (1 + versability))
             int32 dmg = 4.5f * owner->m_unitData->RangedAttackPower;
-            float lowNerf = float(std::min(int32(owner->getLevel()), 20) * 0.05f);
+            int32 lowNerf = std::min(int32(owner->getLevel()), 20) * 0.05f;
 
             if (Player const* ownerPlayer = owner->ToPlayer())
                 dmg = AddPct(dmg, ownerPlayer->m_activePlayerData->Mastery);
@@ -1159,14 +1152,6 @@ public:
                 caster->CastSpell(caster, SPELL_HUNTER_HUNTERS_MARK_AURA_2, true);
                 caster->RemoveAurasDueToSpell(SPELL_HUNTER_MARKING_TARGETS);
             }
-
-            if (caster->HasAura(SPELL_HUNTER_LETHAL_SHOTS) && roll_chance_f(20))
-                if (caster->GetSpellHistory()->HasCooldown(SPELL_HUNTER_RAPID_FIRE))
-                    caster->GetSpellHistory()->ModifyCooldown(SPELL_HUNTER_RAPID_FIRE, -5000);
-
-            if (caster->HasAura(SPELL_HUNTER_CALLING_THE_SHOTS))
-                if (caster->GetSpellHistory()->HasCooldown(SPELL_HUNTER_TRUESHOT))
-                    caster->GetSpellHistory()->ModifyCooldown(SPELL_HUNTER_TRUESHOT, -2500);
         }
 
         void Register() override
@@ -1205,14 +1190,6 @@ public:
                 if (Unit* target = GetHitUnit())
                     caster->CastSpell(target, SPELL_HUNTER_HUNTERS_MARK_AURA, true);
             }
-
-            if (caster->HasAura(SPELL_HUNTER_LETHAL_SHOTS) && roll_chance_f(20))
-                if (caster->GetSpellHistory()->HasCooldown(SPELL_HUNTER_RAPID_FIRE))
-                    caster->GetSpellHistory()->ModifyCooldown(SPELL_HUNTER_RAPID_FIRE, -5000);
-
-            if (caster->HasAura(SPELL_HUNTER_CALLING_THE_SHOTS))
-                if (caster->GetSpellHistory()->HasCooldown(SPELL_HUNTER_TRUESHOT))
-                    caster->GetSpellHistory()->ModifyCooldown(SPELL_HUNTER_TRUESHOT, -2500);
         }
 
         void Register() override

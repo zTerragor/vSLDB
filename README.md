@@ -1,59 +1,91 @@
-# BfaCore Reforged
+# vSLDB - BFA + Shadowlands Preservation project
+BFA 8.3.7 + Shadowlands 9.1 
 
-<p align="center">
-  <img width="400" height="¨400" src="https://www.zupimages.net/up/21/43/6t7q.png">
-</p>
+Доброго времени суток, здесь мы собираемся реализовать наиболее полную базу данных  по BFA + Shadowlands 9.1
+Заинтересовало и хочешь присоединиться к нам ? стучись в Дискорд: https://discord.gg/YxHEMm5Jk6
 
-<p align="center">
- <img width="250" height="30" src="https://www.zupimages.net/up/21/43/drky.jpg">  <img width="250" height="30" src="https://www.zupimages.net/up/21/43/zvg8.jpg">
-</p>
+Good afternoon, here we are going to implement the most complete database on BFA + Shadowlands 9.1
+Interested and want to join us ? knock on the Discard: https://discord.gg/YxHEMm5Jk6
 
-<p align="center"><b>BfaCore : Reforged</b> is a open-source project for World of Warcraft, currently supporting the 8.3.7 (build 35662) game version.</p>
-
-<br>
-<br>
-
-## Why BfaCore (Reforged) ?
-* OpenSource
-* Everybody can participate
-* Most complete Bfa source
-
-The goal of the project is to reproduce the World of Warcraft© game world in a Blizzlike way and as similar as possible to the official game, 
-but also to encourage the development of World of Warcraft© emulators. Correcting and implementing missing content is one of our priorities.
+![p1_2432152_3a9798e7](https://user-images.githubusercontent.com/81566364/143552265-0d32f236-4d10-4672-90d7-2c4b5a212389.jpg)
 
 
-<br>
+Battle for Azeroth 8.3.7
 
-## Support us
-BfaCore is a learning project, and there are lots of different ways to contribute to the project:
+Dungeons (normal,heroic,mythic):
+.Shrine Of TheStorm .TolDagor .Freehold (except Ring of Booty) .Atal'Dazar .The Motherlode .The Underrot .KingsRest .Operation Mechagon (King Gobbamak,Gunker)
 
-* By testing our fixes 
-* By developing directly to the core
-* By reporting bugs 
-* By providing direct support to our community (on Discord)
-* By making extra content (video tutorial for example)
+Raids (normal,heroic,mythic):
+.Nyalotha (Wrathion) .Uldir (Mother,Taloc,Vectis) .Hellfire Citadel
 
-If you want to contribute to the project feel free to join us on our Discord server. Your participation in the project will already be a great help. 
+Scenarios:
+.The Stormwind Extraction .Uncharted Island .Whispering Reef Island
 
-<br>
+World Bosses:
+.Dunegorger kraulok .Jiarak .Tzane
 
-## Requirement
-* CMake : ≥ 3.20
-* Boost : 1.72.0
-* MySQL : 5.7
-* OpenSSL : 1.1.1L
-* Visual Studio 2019
+Allied Races in Starting (all,include Mechagnome)
 
-<br>
+Death Knight All Races
 
-## Link
-* [Our Discord](https://discord.gg/hTtSYh7WbQ)
+Starting zone Death Knight New and Old
 
-<br>
+Starting zone Pandaren
 
-## Licence 
-* BfACore source components are released under the [GNU AGPL v3](https://github.com/Boralus-Project/BfaCore-Reforged/blob/main/LICENSE)
-<br>
-<br>
+Starting zone Worgen
 
-**Important :** `Nobody is allowed to push commits directly to the core. All changes are reviewed and tested before.`
+Starting zone Demon Hunter
+
+XP Rate x 3 + Npc for changing rate x1,x2,x3
+
+Npc with Free Heirlooms
+
+Riding Skill in Starting
+
+Mythic+
+
+War Mode
+
+Level Scaling
+
+Loot Normal,Heroic,Mythic,Mythic+ & Loot Personal working
+
+Battlegrounds and Arenas Random
+
+LFG
+
+Darkmoon Fire Event
+
+All Classes playable (working on it)
+
+Scraping
+
+Brawlers guild rank 1 to 7 boss
+
+Zones Spawned and Quests Working: .Drustvar .Stormsong Valley .Tiragarde Sound .Nazmir .Voldun .Zuldazar .Mechagon .Nazjatar
+
+Legion
+
+The most of dungeons/raids working
+The most of quests working
+All zones spawned
+Warlods of Draenor
+
+Draenor Intro working
+The most of dungeons/raids working
+The most of quests working
+All zones spawned
+Garrison (working on it)
+Pandaria,Cataclysm,Linch King,TBC
+
+The most of dungeons/raids working
+The most of quests working
+All zones spawned
+It is completely open source.
+
+Requirements
+Software requirements are available in the wiki for Windows, Linux and macOS.
+
+Install
+Detailed installation guides are available in the wiki for Windows, Linux and macOS.
+![battle-for-azeroth-key-art-100769684-large](https://user-images.githubusercontent.com/81566364/143552288-86fc8550-a0e0-4dfb-8528-9d051e89a6b0.jpg)

@@ -10,6 +10,7 @@ enum Spells
     SPELL_JOLT = 263318,
     SPELL_CONDUCTION = 263371,
     SPELL_GUST = 263775,
+
     SPELL_CYCLONE_STRIKE_CAST = 261773,
     SPELL_CYCLONE_STRIKE_DMG = 263573,
     SPELL_CYCLONE_STRIKE_AT = 263325,
@@ -20,14 +21,17 @@ enum Spells
 
 enum Events
 {
-    EVENT_CHECK_ENERGY = 1,
+    EVENT_CHECK_ENERGY  = 1,
+
     EVENT_JOLT,
     EVENT_CONDUCTION,
     EVENT_STATIC_SHOCK,
     EVENT_CYCLONE_STRIKE,
+
     EVENT_A_PEAL_OF_THUNDER,
     EVENT_ARC_DASH,
     EVENT_GUST,
+
     EVENT_ARCING_BLADE,
     EVENT_GALE_FORCE,
 };
@@ -35,11 +39,13 @@ enum Events
 enum Timers
 {
     TIMER_CHECK_ENERGY = 3 * IN_MILLISECONDS,
+
     TIMER_GUST = 10 * IN_MILLISECONDS,
     TIMER_JOLT = 5 * IN_MILLISECONDS,
     TIMER_CONDUCTION = 15 * IN_MILLISECONDS,
-    TIMER_CYCLONE_STRIKE = 25 * IN_MILLISECONDS,
+    TIMER_CYCLONE_STRIKE  = 25 * IN_MILLISECONDS,
     TIMER_A_PEAL_OF_THUNDER = 10 * IN_MILLISECONDS,
+
     TIMER_ARCING_BLADE = 12 * IN_MILLISECONDS,
     TIMER_GALE_FORCE = 22 * IN_MILLISECONDS,
 };
@@ -87,27 +93,23 @@ uint8 AdderisAndAspix(InstanceScript* instance, Creature* me)
 class bfa_boss_adderis : public CreatureScript
 {
 public:
-    bfa_boss_adderis() : CreatureScript("bfa_boss_adderis") { }
+    bfa_boss_adderis() : CreatureScript("bfa_boss_adderis")
+    {
+    }
 
     struct bfa_boss_adderis_AI : public BossAI
     {
-        bfa_boss_adderis_AI(Creature* creature) : BossAI(creature, DATA_ADDERIS_AND_ASPIX)  { }
+        bfa_boss_adderis_AI(Creature* creature) : BossAI(creature, DATA_ADDERIS_AND_ASPIX)
+        {
+            me->RemoveUnitFlag2(UNIT_FLAG2_REGENERATE_POWER);
+            instance = me->GetInstanceScript();
+        }
 
-    private:
+        InstanceScript* instance;
+        EventMap events;
         bool shielded;
         bool castSpecial;
 
-        void Reset() override
-        {
-            events.Reset();
-            castSpecial = false;
-            shielded = false;
-            me->SetPowerType(POWER_ENERGY);
-            me->SetMaxPower(POWER_ENERGY, 100);
-            me->SetPower(POWER_ENERGY, 0);            
-            RespawnAspixAtWipe();
-            me->RemoveUnitFlag2(UNIT_FLAG2_REGENERATE_POWER);
-        }
 
         void SelectSoundAndText(Creature* me, uint32  selectedTextSound = 0)
         {
@@ -131,14 +133,21 @@ public:
             }
         }
 
+        void Reset()
+        {
+            events.Reset();
+            castSpecial = false;
+            shielded = false;
+            me->SetPowerType(POWER_ENERGY);
+            me->SetMaxPower(POWER_ENERGY, 100);
+            me->SetPower(POWER_ENERGY, 0);
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+            RespawnAspixAtWipe();
+        }
+
         Creature* GetAspix()
         {
             return me->FindNearestCreature(BOSS_ASPIX, 200.0f, true);
-        }
-
-        Creature* GetAdderisDead()
-        {
-            return me->FindNearestCreature(BOSS_ADDERIS, 200.0f, false);
         }
 
         Creature* GetAspixDead()
@@ -149,17 +158,17 @@ public:
         void RespawnAspixAtWipe()
         {
             if (Creature* aspix = GetAspix())
+            {
                 aspix->Respawn();
+            }
         }
 
-        void DoAction(int32 action) override
+        void DoAction(int32 action)
         {
             switch (action)
             {
             case ACTION_FINISH_OTHER:
                 instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-                if (GameObject* adderisAspixDoor = me->FindNearestGameObject(GO_ADDERIS_ASPIX_EXIT, 100.0f))
-                    adderisAspixDoor->SetGoState(GO_STATE_ACTIVE);
                 break;
             case ACTION_SHIELDED:
             {
@@ -173,7 +182,7 @@ public:
             }
         }
 
-        void JustDied(Unit*) override
+        void JustDied(Unit*)
         {
             SelectSoundAndText(me, 2);
 
@@ -193,28 +202,28 @@ public:
             }
         }
 
-        void EnterEvadeMode(EvadeReason why) override
+        void EnterEvadeMode(EvadeReason w)
         {
             _DespawnAtEvade(15);
         }
 
-        void DamageTaken(Unit* at, uint32& damage) override
+        void DamageTaken(Unit* at, uint32& damage)
         {
             if (me->HasAura(SPELL_LIGHTNING_SHIELD_AURA))
                 damage = 0;
         }
 
-        void EnterCombat(Unit*) override
+        void EnterCombat(Unit*)
         {
             if (Creature* aspix = GetAspix())
                 aspix->SetInCombatWithZone();
             me->SetPower(POWER_ENERGY, 0);
-            _EnterCombat();
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
 
             events.ScheduleEvent(EVENT_CHECK_ENERGY, TIMER_CHECK_ENERGY);
             events.ScheduleEvent(EVENT_GUST, TIMER_GUST);
 
-            if (IsHeroic() || IsMythic())
+            if (me->GetMap()->IsHeroic() || me->GetMap()->IsMythic())
                 events.ScheduleEvent(EVENT_ARCING_BLADE, TIMER_ARCING_BLADE);
         }
 
@@ -240,7 +249,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -276,7 +285,7 @@ public:
                                 aspix->AI()->DoAction(ACTION_SHIELDED);
                                 me->RemoveAura(SPELL_LIGHTNING_SHIELD_AURA);
                             }
-                            for (uint8 i = 0; i < 3; ++i)
+                            for(uint8 i = 0; i < 3; ++i)
                                 HandleArcDash();
                             me->SetPower(POWER_ENERGY, 0);
                             castSpecial = false;
@@ -329,6 +338,7 @@ public:
                     break;
                 }
             }
+            DoMeleeAttackIfReady();
         }
     };
 
@@ -341,27 +351,22 @@ public:
 class bfa_boss_aspix : public CreatureScript
 {
 public:
-    bfa_boss_aspix() : CreatureScript("bfa_boss_aspix") { }
+    bfa_boss_aspix() : CreatureScript("bfa_boss_aspix")
+    {
+    }
+
     struct bfa_boss_aspix_AI : public BossAI
     {
-        bfa_boss_aspix_AI(Creature* creature) : BossAI(creature, DATA_ADDERIS_AND_ASPIX) { }
+        bfa_boss_aspix_AI(Creature* creature) : BossAI(creature, DATA_ADDERIS_AND_ASPIX)
+        {
+            me->RemoveUnitFlag2(UNIT_FLAG2_REGENERATE_POWER);
+            instance = me->GetInstanceScript();
+        }
 
-    private:
+        InstanceScript* instance;
+        EventMap events;
         bool shielded;
         bool castSpecial;
-
-        void Reset() override
-        {
-            shielded = false;
-            castSpecial = false;
-            events.Reset();
-            me->SetPowerType(POWER_ENERGY);
-            RespawnAdderisAtWipe();
-            me->SetMaxPower(POWER_ENERGY, 100);
-            me->SetPower(POWER_ENERGY, 0);
-            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-            me->RemoveUnitFlag2(UNIT_FLAG2_REGENERATE_POWER);
-        }
 
         void SelectSoundAndText(Creature* me, uint32  selectedTextSound = 0)
         {
@@ -385,6 +390,17 @@ public:
             }
         }
 
+        void Reset()
+        {
+            shielded = false;
+            castSpecial = false;
+            events.Reset();
+            me->SetPowerType(POWER_ENERGY);
+            RespawnAdderisAtWipe();
+            me->SetMaxPower(POWER_ENERGY, 100);
+            me->SetPower(POWER_ENERGY, 0);
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+        }
         Creature* GetAdderis()
         {
             return me->FindNearestCreature(BOSS_ADDERIS, 200.0f, true);
@@ -395,25 +411,20 @@ public:
             return me->FindNearestCreature(BOSS_ADDERIS, 200.0f, false);
         }
 
-        Creature* GetAspixDead()
-        {
-            return me->FindNearestCreature(BOSS_ASPIX, 200.0f, false);
-        }
-
         void RespawnAdderisAtWipe()
         {
             if (Creature* adderis = GetAdderisDead())
+            {
                 adderis->Respawn();
+            }
         }
 
-        void DoAction(int32 action) override
+        void DoAction(int32 action)
         {
             switch (action)
             {
             case ACTION_FINISH_OTHER:
                 instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-                if (GameObject* adderisAspixDoor = me->FindNearestGameObject(GO_ADDERIS_ASPIX_EXIT, 100.0f))
-                    adderisAspixDoor->SetGoState(GO_STATE_ACTIVE);
                 break;
             case ACTION_SHIELDED:
             {
@@ -428,7 +439,7 @@ public:
             }
         }
 
-        void JustDied(Unit*) override
+        void JustDied(Unit*)
         {
             SelectSoundAndText(me, 2);
 
@@ -448,18 +459,20 @@ public:
             }
         }
 
-        void EnterEvadeMode(EvadeReason w) override
+        void EnterEvadeMode(EvadeReason w)
         {
             _DespawnAtEvade(15);
         }
 
-        void DamageTaken(Unit* attacker, uint32& damage) override
+        void DamageTaken(Unit* attacker, uint32& damage)
         {
             if (me->HasAura(SPELL_LIGHTNING_SHIELD_AURA))
+            {
                 damage = 0;
+            }
         }
 
-        void EnterCombat(Unit*) override
+        void EnterCombat(Unit*)
         {
             SelectSoundAndText(me, 3);
             if (Creature* adderis = GetAdderis())
@@ -467,17 +480,17 @@ public:
 
             me->CastSpell(me, SPELL_LIGHTNING_SHIELD_AURA, true);
             me->SetPower(POWER_ENERGY, 0);
-            _EnterCombat();
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
 
             events.ScheduleEvent(EVENT_CHECK_ENERGY, TIMER_CHECK_ENERGY);
             events.ScheduleEvent(EVENT_CYCLONE_STRIKE, TIMER_CYCLONE_STRIKE);
             events.ScheduleEvent(EVENT_JOLT, TIMER_JOLT);
 
-            if (IsHeroic() || IsMythic())
+            if (me->GetMap()->IsHeroic() || me->GetMap()->IsMythic())
                 events.ScheduleEvent(EVENT_GALE_FORCE, TIMER_GALE_FORCE);
         }
 
-        void UpdateAI(uint32 diff) override
+        void UpdateAI(uint32 diff)
         {
             events.Update(diff);
 
@@ -553,6 +566,7 @@ public:
                     break;
                 }
             }
+            DoMeleeAttackIfReady();
         }
     };
 
@@ -597,7 +611,6 @@ public:
         }
 
     };
-
     SpellScript* GetSpellScript() const
     {
         return new bfa_spell_arcing_blade_SpellScript();
@@ -608,5 +621,6 @@ void AddSC_boss_adderis_and_aspix()
 {
     new bfa_boss_adderis();
     new bfa_boss_aspix();
+
     new bfa_spell_arcing_blade();
 }

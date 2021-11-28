@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2021 BfaCore Reforged
+* Copyright (C) 2020 BfaCore
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -3940,51 +3940,6 @@ public:
     }
 };
 
-struct npc_lorna_crowley_36457 : public ScriptedAI
-{
-    npc_lorna_crowley_36457(Creature* creature) : ScriptedAI(creature) { }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (!who)
-            return;
-
-        Vehicle* pVehicle = who->GetVehicleKit();
-        if (!pVehicle)
-            return;
-
-        if (!me->IsWithinDistInMap(who, 5.0f))
-            return;
-
-        Unit* rider = pVehicle->GetPassenger(0);
-        if (!rider)
-            return;
-
-        if (Player* player = rider->ToPlayer())
-        {
-            player->KilledMonsterCredit(36560, ObjectGuid::Empty);
-            player->ExitVehicle();
-            who->ToCreature()->ForcedDespawn(100);
-        }
-    }
-};
-
-struct npc_dark_ranger_thyala_36312 : public ScriptedAI
-{
-    npc_dark_ranger_thyala_36312(Creature* c) : ScriptedAI(c) { }
-
-    void JustDied(Unit* target) override
-    {
-        std::list<Player*> playerList;
-        me->GetPlayerListInGrid(playerList, 50.0f);
-        for (Player* player : playerList)
-        {
-            if (player->GetQuestStatus(QUEST_LEADER_OF_THE_PACK) == QUEST_STATUS_INCOMPLETE)
-                player->KilledMonsterCredit(me->GetEntry());
-        }
-    }
-};
-
 void AddSC_gilneas_c1()
 {
     new npc_frightened_citizen();
@@ -4045,6 +4000,4 @@ void AddSC_gilneas_c1()
     new item_belysras_talisman_49944();
     RegisterPlayerScript(gilneas_phases);
     new npc_lorna_crowley_43727();
-    RegisterCreatureAI(npc_lorna_crowley_36457);
-    RegisterCreatureAI(npc_dark_ranger_thyala_36312);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -110,33 +110,6 @@ enum DruidSpells
     //SPELL_ZANDALARI_TROLL_AQUATIC_FORM = ?
     SPELL_FERAL_FRENZY_MAIN = 274837,
     SPELL_FERAL_FRENZY_BLEED = 274838,
-    SPELL_DRU_ECLIPSE = 279619,
-    SPELL_DRU_SOLAR_EMPOWEREMENT = 164545,
-    SPELL_DRU_LUNAR_EMPOWEREMENT = 164547,
-    SPELL_DRU_STARLORD = 203245,
-    SPELL_DRU_STARLORD_BUFF = 279709,
-    //
-    SPELL_DRU_ABUNDANCE = 207383,
-    SPELL_DRU_ABUNDANCE_BUFF = 207640,
-    SPELL_DRU_SOUL_OF_THE_FOREST_RESTO = 158478,
-    SPELL_DRU_SOUL_OF_THE_FOREST_RESTO_BUFF = 114108,
-    SPELL_DRU_CULTIVATION = 200390,
-    SPELL_DRU_CULTIVATION_HEAL = 200389,
-    SPELL_DRU_GERMINATION = 155675,
-    SPELL_DRU_GERMINATION_HOT = 155777,
-    SPELL_DRU_GLYPH_OF_REJUVENATION = 17076,
-    SPELL_DRU_GLYPH_OF_REJUVENATION_EFFECT = 96206,
-    SPELL_DRU_SPRING_BLOSSOMS = 207385,
-    SPELL_DRU_SPRING_BLOSSOMS_HEAL = 207386,
-    SPELL_DRU_PHOTOSYNTHESIS = 274902,
-    SPELL_DRU_PHOTOSYNTHESIS_MOD_HEAL_TICKS = 274906,
-    SPELL_DRU_LUNAR_BEAM_DAMAGE_HEAL = 204069,
-    SPELL_DRU_URSOL_VORTEX_PULL = 118283,
-    SPELL_DRU_MASS_ENTANGLEMENT = 102359,
-    SPELL_DRU_GALACTIC_GUARDIAN = 203964,
-    SPELL_DRU_GALACTIC_GAURDIAN_MOD_MOONFIRE = 213708,
-    SPELL_DRU_PREDATOR = 202021,
-    SPELL_DRU_TIGER_FURY = 5217,
 };
 
 enum ShapeshiftFormSpells
@@ -349,18 +322,9 @@ class spell_dru_efflorescence_aura : public AuraScript
 
     void HandleHeal(AuraEffect const* /*aurEff*/)
     {
-        if (GetCaster() && GetCaster()->GetOwner())
-        {
-            GetCaster()->GetOwner()->CastSpell(GetCaster()->GetPosition(), SPELL_DRUID_EFFLORESCENCE_HEAL, true, nullptr, nullptr, GetCaster()->GetOwnerGUID());
-            std::list<Player*> playerList;
-            GetCaster()->GetPlayerListInGrid(playerList, 11.2f);
-            for (auto& targets : playerList)
-            {
-                if (GetCaster()->GetOwner()->HasAura(SPELL_DRU_SPRING_BLOSSOMS))
-                    if (!targets->HasAura(SPELL_DRU_SPRING_BLOSSOMS_HEAL))
-                        GetCaster()->GetOwner()->CastSpell(targets, SPELL_DRU_SPRING_BLOSSOMS_HEAL, true, nullptr, nullptr, GetCaster()->GetOwnerGUID());
-            }
-        }
+        if (Unit* caster = GetCaster())
+            if (caster->GetOwner())
+                caster->GetOwner()->CastSpell(caster->GetPosition(), SPELL_DRUID_EFFLORESCENCE_HEAL, true, nullptr, nullptr, caster->GetOwnerGUID());
     }
 
     void Register() override
@@ -3691,18 +3655,73 @@ class spell_dru_rejuvenation : public SpellScriptLoader
 public:
     spell_dru_rejuvenation() : SpellScriptLoader("spell_dru_rejuvenation") { }
 
+    enum Spells
+    {
+        SPELL_DRUID_CULTIVATION = 200390,
+        SPELL_DRUID_CULTIVATION_HOT = 200389,
+        SPELL_DRUID_GERMINATION = 155675,
+        SPELL_DRUID_GERMINATION_HOT = 155777,
+        SPELL_DRUID_ABUNDANCE = 207383,
+        SPELL_DRUID_ABUNDANCE_BUFF = 207640,
+    };
+
     class spell_dru_rejuvenation_AuraScript : public AuraScript
     {
         PrepareAuraScript(spell_dru_rejuvenation_AuraScript);
 
+        //Posible Fixed
+
+
+      // bool Validate(SpellInfo const* /*spellInfo*/) override
+      // {
+      //     return ValidateSpellInfo(
+      //         {
+      //             SPELL_DRUID_CULTIVATION,
+      //             SPELL_DRUID_CULTIVATION_HOT,
+      //             SPELL_DRUID_ABUNDANCE,
+      //             SPELL_DRUID_ABUNDANCE_BUFF,
+      //         });
+      // }
+      //
+      // void AfterRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+      // {
+      //     if (Unit* caster = GetCaster())
+      //         if (caster->HasAura(SPELL_DRUID_ABUNDANCE))
+      //             if (Aura* abundanceBuff = caster->GetAura(SPELL_DRUID_ABUNDANCE_BUFF))
+      //                 abundanceBuff->ModStackAmount(-1);
+      // }
+      //
+      // void OnPeriodic(AuraEffect const* aurEff)
+      // {
+      //     if (Unit* target = GetTarget())
+      //         if (GetCaster()->HasAura(SPELL_DRUID_CULTIVATION) && !target->HasAura(SPELL_DRUID_CULTIVATION_HOT) && target->HealthBelowPct(sSpellMgr->GetSpellInfo//(SPELL_DRUID_CULTIVATION)->GetEffect(EFFECT_0)->BasePoints))
+      //             GetCaster()->CastSpell(target, SPELL_DRUID_CULTIVATION_HOT, true);
+      // }
+      //
+      // void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+      // {
+      //     if (!GetCaster())
+      //         return;
+      //
+      //     amount = CalculatePct(GetCaster()->SpellBaseHealingBonusDone(SPELL_SCHOOL_MASK_NATURE), 60);
+      // }
+
+         //Posible Fixed
+
+        enum Spells
+        {
+            GlyphofRejuvenation = 17076,
+            GlyphofRejuvenationEffect = 96206
+        };
         void HandleCalculateAmount(AuraEffect const* /*p_AurEff*/, int32& amount, bool& /*canBeRecalculated*/)
         {
-            if (Unit* caster = GetCaster())
-            {                
-                if (caster->HasAura(SPELL_DRUID_SOUL_OF_THE_FOREST_RESTO) && !caster->HasAura(SPELL_DRUID_REJUVENATION))
+            if (Unit* l_Caster = GetCaster())
+            {
+                ///If soul of the forest is activated we increase the heal by 100%
+                if (l_Caster->HasAura(SPELL_DRUID_SOUL_OF_THE_FOREST_RESTO) && !l_Caster->HasAura(SPELL_DRUID_REJUVENATION))
                 {
                     amount *= 2;
-                    caster->RemoveAura(SPELL_DRUID_SOUL_OF_THE_FOREST_RESTO);
+                    l_Caster->RemoveAura(SPELL_DRUID_SOUL_OF_THE_FOREST_RESTO);
                 }
             }
         }
@@ -3714,19 +3733,12 @@ public:
             if (!caster)
                 return;
 
-            if (AuraEffect* GlyphOfRejuvenation = caster->GetAuraEffect(SPELL_DRU_GLYPH_OF_REJUVENATION, EFFECT_0))
+            if (AuraEffect* GlyphOfRejuvenation = caster->GetAuraEffect(Spells::GlyphofRejuvenation, EFFECT_0))
             {
                 GlyphOfRejuvenation->SetAmount(GlyphOfRejuvenation->GetAmount() + 1);
                 if (GlyphOfRejuvenation->GetAmount() >= 3)
-                    caster->CastSpell(caster, SPELL_DRU_GLYPH_OF_REJUVENATION_EFFECT, true);
+                    caster->CastSpell(caster, Spells::GlyphofRejuvenationEffect, true);
             }
-        }
-
-        void OnPeriodic(AuraEffect const* AurEff)
-        {
-            if (Unit* target = GetTarget())
-                if (GetCaster()->HasAura(SPELL_DRU_CULTIVATION) && !target->HasAura(SPELL_DRU_CULTIVATION_HEAL) && target->HealthBelowPct(60))
-                    GetCaster()->CastSpell(target, SPELL_DRU_CULTIVATION_HEAL, true);
         }
 
         void OnRemove(AuraEffect const* /*p_AurEff*/, AuraEffectHandleModes /*p_Mode*/)
@@ -3736,20 +3748,24 @@ public:
             if (!caster)
                 return;
 
-            if (AuraEffect* l_GlyphOfRejuvenation = caster->GetAuraEffect(SPELL_DRU_GLYPH_OF_REJUVENATION, EFFECT_0))
+            if (AuraEffect* l_GlyphOfRejuvenation = caster->GetAuraEffect(Spells::GlyphofRejuvenation, EFFECT_0))
             {
                 l_GlyphOfRejuvenation->SetAmount(l_GlyphOfRejuvenation->GetAmount() - 1);
                 if (l_GlyphOfRejuvenation->GetAmount() < 3)
-                    caster->RemoveAura(SPELL_DRU_GLYPH_OF_REJUVENATION_EFFECT);
+                    caster->RemoveAura(Spells::GlyphofRejuvenationEffect);
             }
         }
 
         void Register() override
         {
+            // Posible Fixed
             OnEffectApply += AuraEffectApplyFn(spell_dru_rejuvenation_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_dru_rejuvenation_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_rejuvenation_AuraScript::HandleCalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_dru_rejuvenation_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+
+          //  OnEffectPeriodic += AuraEffectPeriodicFn(spell_dru_rejuvenation_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+          //  DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_rejuvenation_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+          //  AfterEffectRemove += AuraEffectRemoveFn(spell_dru_rejuvenation_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
@@ -3761,6 +3777,17 @@ public:
     class spell_dru_rejuvenation_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_dru_rejuvenation_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo(
+                {
+                    SPELL_DRUID_GERMINATION,
+                    SPELL_DRUID_GERMINATION_HOT,
+                    SPELL_DRUID_ABUNDANCE,
+                    SPELL_DRUID_ABUNDANCE_BUFF,
+                });
+        }
 
         int32 m_RejuvenationAura = 0;
         int32 m_RejuvenationAuraAmount = 0;
@@ -3788,6 +3815,8 @@ public:
                     caster->RemoveAura(SPELL_DRUID_SOUL_OF_THE_FOREST_RESTO);
                 }
             }
+            if (caster->HasAura(207383))
+                caster->CastSpell(caster, SPELL_DRUID_ABUNDANCE, true);
         }
 
         void HandleBeforeHit(SpellMissInfo missInfo)
@@ -3802,25 +3831,26 @@ public:
 
             if (caster->HasAura(SPELL_DRUID_SOUL_OF_THE_FOREST_RESTO))
             {
-                //NewRejuvenationAuraEffect->SetAmount(NewRejuvenationAuraEffect->GetAmount() * 2);
+                //      NewRejuvenationAuraEffect->SetAmount(NewRejuvenationAuraEffect->GetAmount() * 2);
                 SetHitHeal(GetHitHeal() * 2);
-                //caster->RemoveAura(SPELL_DRUID_SOUL_OF_THE_FOREST_RESTO);
+                //      caster->RemoveAura(SPELL_DRUID_SOUL_OF_THE_FOREST_RESTO);
             }
 
-            if (caster->HasAura(SPELL_DRU_GERMINATION) && target->HasAura(SPELL_DRUID_REJUVENATION, caster->GetGUID()))
+            ///Germination
+            if (caster->HasAura(155675) && target->HasAura(SPELL_DRUID_REJUVENATION, caster->GetGUID()))
             {
                 Aura* RejuvenationAura = target->GetAura(SPELL_DRUID_REJUVENATION, caster->GetGUID());
                 if (!RejuvenationAura)
                     return;
 
-                if (!target->HasAura(SPELL_DRU_GERMINATION_HOT, caster->GetGUID()))
+                if (!target->HasAura(155777, caster->GetGUID()))
                 {
-                    caster->CastSpell(target, SPELL_DRU_GERMINATION_HOT, true);
+                    caster->CastSpell(target, 155777, true);
                     m_RejuvenationAura = RejuvenationAura->GetDuration();
                 }
                 else
                 {
-                    Aura* GerminationAura = target->GetAura(SPELL_DRU_GERMINATION_HOT, caster->GetGUID());
+                    Aura* GerminationAura = target->GetAura(155777, caster->GetGUID());
                     Aura* RejuvenationAura = target->GetAura(SPELL_DRUID_REJUVENATION, caster->GetGUID());
                     if (GerminationAura && RejuvenationAura)
                     {
@@ -3832,7 +3862,7 @@ public:
                         }
                         else
                         {
-                            caster->CastSpell(target, SPELL_DRU_GERMINATION_HOT, true);
+                            caster->CastSpell(target, 155777, true);
                             m_RejuvenationAura = RejuvenationDuration;
                         }
                     }
@@ -4022,9 +4052,6 @@ class spell_druid_lunar_strike : public SpellScript
 
                 moonfireDOT->SetDuration(newDuration);
             }
-
-        if (GetCaster() && roll_chance_f(20) && GetCaster()->HasAura(SPELL_DRU_ECLIPSE))
-            GetCaster()->CastSpell(nullptr, SPELL_DRU_SOLAR_EMPOWEREMENT, true);
     }
 
     void HandleHit(SpellEffIndex /*effIndex*/)
@@ -4076,8 +4103,6 @@ class spell_druid_solar_wrath : public SpellScript
 
                     sunfireDOT->SetDuration(newDuration);
                 }
-        if (GetCaster() && roll_chance_f(20) && GetCaster()->HasAura(SPELL_DRU_ECLIPSE))
-            GetCaster()->CastSpell(nullptr, SPELL_DRU_LUNAR_EMPOWEREMENT, true);
     }
 
     void Register() override
@@ -4339,175 +4364,6 @@ public:
     }
 };
 
-//78674
-class spell_dru_starsurge : public SpellScript
-{
-    PrepareSpellScript(spell_dru_starsurge);
-
-    void HandleOnHit()
-    {
-        if (GetCaster())
-            if (GetCaster()->GetAuraCount(SPELL_DRU_STARLORD_BUFF) < 3)
-                GetCaster()->CastSpell(nullptr, SPELL_DRU_STARLORD_BUFF, true);
-    }
-
-    void Register() override
-    {
-        OnHit += SpellHitFn(spell_dru_starsurge::HandleOnHit);
-    }
-};
-
-//191034
-class spell_dru_starfall : public SpellScript
-{
-    PrepareSpellScript(spell_dru_starfall);
-
-    void HandleOnHit()
-    {
-        if (GetCaster())
-            if (GetCaster()->GetAuraCount(SPELL_DRU_STARLORD_BUFF) < 3)
-                GetCaster()->CastSpell(nullptr, SPELL_DRU_STARLORD_BUFF, true);
-    }
-
-    void Register() override
-    {
-        OnHit += SpellHitFn(spell_dru_starfall::HandleOnHit);
-    }
-};
-
-//252216
-class spell_dru_tiger_dash : public SpellScript
-{
-    PrepareSpellScript(spell_dru_tiger_dash);
-
-    void OnActivate()
-    {
-        if (Player* player = GetCaster()->ToPlayer())
-            player->CastSpell(player, SPELL_DRUID_CAT_FORM, true);
-    }
-
-    void Register() override
-    {
-        OnCast += SpellCastFn(spell_dru_tiger_dash::OnActivate);
-    }    
-};
-
-//274902
-class spell_dru_photosynthesis : public AuraScript
-{
-    PrepareAuraScript(spell_dru_photosynthesis);
-
-    void OnApply(const AuraEffect* /* aurEff */, AuraEffectHandleModes /*mode*/)
-    {
-        if (!GetCaster()->HasAura(SPELL_DRU_PHOTOSYNTHESIS_MOD_HEAL_TICKS))
-            GetCaster()->AddAura(SPELL_DRU_PHOTOSYNTHESIS_MOD_HEAL_TICKS);
-    }
-
-    void OnRemove(const AuraEffect* /* aurEff */, AuraEffectHandleModes /*mode*/)
-    {
-        if (GetCaster()->HasAura(SPELL_DRU_PHOTOSYNTHESIS_MOD_HEAL_TICKS))
-            GetCaster()->RemoveAura(SPELL_DRU_PHOTOSYNTHESIS_MOD_HEAL_TICKS);
-    }
-
-    void Register() override
-    {
-        OnEffectApply += AuraEffectApplyFn(spell_dru_photosynthesis::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        OnEffectRemove += AuraEffectRemoveFn(spell_dru_photosynthesis::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
-//10682, 204066
-struct at_dru_lunar_beam : AreaTriggerAI
-{
-    at_dru_lunar_beam(AreaTrigger* at) : AreaTriggerAI(at) { }
-
-    void OnCreate() override
-    {
-        at->SetPeriodicProcTimer(1000);
-    }
-
-    void OnPeriodicProc() override
-    {
-        if (at->GetCaster())
-            at->GetCaster()->CastSpell(at->GetPosition(), SPELL_DRU_LUNAR_BEAM_DAMAGE_HEAL, true);
-    }
-};
-
-//3020, 102793
-struct at_dru_ursol_vortex : AreaTriggerAI
-{
-    at_dru_ursol_vortex(AreaTrigger* at) : AreaTriggerAI(at) { }
-
-private:
-    bool pull;
-
-    void OnCreate() override
-    {
-        pull = false;
-    }
-
-    void OnUnitEnter(Unit* target) override
-    {
-        if (target->IsValidAttackTarget(at->GetCaster()) && !pull)
-        {
-            pull = true;
-            target->CastSpell(at->GetPosition(), SPELL_DRU_URSOL_VORTEX_PULL, true);
-        }
-    }
-};
-
-//102359
-class spell_dru_mass_entanglement : public SpellScript
-{
-    PrepareSpellScript(spell_dru_mass_entanglement);
-
-    void HandleCast()
-    {
-        std::list<Unit*> targetList;
-        GetCaster()->GetAttackableUnitListInRange(targetList, 15.0f);
-        if (targetList.size())
-            for (auto& targets : targetList)
-            {
-                GetCaster()->AddAura(SPELL_DRU_MASS_ENTANGLEMENT, targets);
-            }
-    }
-
-    void Register() override
-    {
-        OnCast += SpellCastFn(spell_dru_mass_entanglement::HandleCast);
-    }
-};
-
-class dru_predator : public PlayerScript
-{
-public:
-    dru_predator() : PlayerScript("dru_predator") { }
-
-    void OnPVPKill(Player* killer, Player* killed) 
-    { 
-        if (killer->getClass() == CLASS_DRUID)
-            return;
-
-        if (!killer->HasAura(SPELL_DRU_PREDATOR))
-            return;
-
-        if (killer->GetSpellHistory()->HasCooldown(SPELL_DRU_TIGER_FURY))
-            killer->GetSpellHistory()->ResetCooldown(SPELL_DRU_TIGER_FURY);
-    }
-
-    void OnCreatureKill(Player* killer, Creature* killed) 
-    { 
-        if (killer->getClass() == CLASS_DRUID)
-            return;
-
-        if (!killer->HasAura(SPELL_DRU_PREDATOR))
-            return;
-
-        if (killer->GetSpellHistory()->HasCooldown(SPELL_DRU_TIGER_FURY))
-            killer->GetSpellHistory()->ResetCooldown(SPELL_DRU_TIGER_FURY);
-    }
-};
-
 void AddSC_druid_spell_scripts()
 {
     RegisterSpellScript(spell_dru_efflorescence);
@@ -4606,12 +4462,4 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(incarnation_tree_of_life);
     RegisterSpellScript(spell_feral_frenzy);
     RegisterPlayerScript(feral_spells);
-    RegisterSpellScript(spell_dru_starsurge);
-    RegisterSpellScript(spell_dru_starfall);
-    RegisterSpellScript(spell_dru_tiger_dash);
-    RegisterAuraScript(spell_dru_photosynthesis);
-    RegisterAreaTriggerAI(at_dru_lunar_beam);
-    RegisterAreaTriggerAI(at_dru_ursol_vortex);
-    RegisterSpellScript(spell_dru_mass_entanglement);
-    RegisterPlayerScript(dru_predator);
 }

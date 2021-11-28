@@ -83,7 +83,7 @@ DataDir = ".\ClientData"
 #                     Logs directory must exists, or log file creation will be disabled.
 #        Default:     "" - (Log files will be stored in the current path)
 
-LogsDir = ".\Logs"
+LogsDir = ".\Data\Logs"
 
 #
 #    LoginDatabaseInfo
@@ -214,7 +214,7 @@ BuildDirectory  = ""
 #        Example:     "../TrinityCore"
 #        Default:     ""
 
-SourceDirectory  = ""
+SourceDirectory  = ".\Updater\"
 
 #
 #    MySQLExecutable
@@ -225,7 +225,7 @@ SourceDirectory  = ""
 #                     "/usr/bin/mysql"
 #        Default:     ""
 
-MySQLExecutable = ""
+MySQLExecutable = ".\Data\MySQL\bin\mysql.exe"
 
 #
 #    IPLocationFile
@@ -1194,7 +1194,7 @@ BeepAtStart = 1
 #        Example:     "Welcome to John's Server!@This server is proud to be powered by Trinity Core."
 #        Default:     "Welcome to a Trinity Core server."
 
-Motd = "Welcome to BfaCore Reforged | Battle for Azeroth 8.3.7."
+Motd = "Welcome to BfaCore 8.3.7 server."
 
 #
 #    Server.LoginInfo
@@ -1564,8 +1564,9 @@ TalentsInspecting = 1
 # CREATURE SETTINGS
 #
 #    ThreatRadius
-#        Description: Distance for creatures to evade after being pulled away from the creature
-#                     spawn point.
+#        Description: Distance for creatures to evade after being pulled away from the combat
+#                     starting point. If ThreatRadius is less than creature aggro radius then aggro
+#                     radius will be used.
 #        Default:     60
 
 ThreatRadius = 60
@@ -2451,17 +2452,6 @@ AutoBroadcast.Center = 0
 #        Default:     600000 - (10 minutes)
 
 AutoBroadcast.Timer = 600000
-
-#    Autorestart.Timer
-#        Description: Automatic server restart by timer. Works when started via a restart, 
-#        otherwise it shuts down the server (instead of restarting).
-#
-#		 Default: 0 - disable
-#				 60 - restart 60 seconds after starting the server
-#				 3600 - restart 1 hour after starting the server
-#				 86400 - restart 24 hours after starting
-
-Autorestart.Timer = 0
 
 #
 ###################################################################################################
@@ -4163,14 +4153,14 @@ Metric.OverallStatusInterval = 1
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-FeatureSystem.BpayStore.Enabled = 0
+FeatureSystem.BpayStore.Enabled = 1
 
 #   Purchase.Shop.Enabled
 #        Description: Not yet implemented
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Purchase.Shop.Enabled = 0
+Purchase.Shop.Enabled = 1
 
 #
 ###################################################################################################
@@ -4234,6 +4224,19 @@ Dungeon.WeightedMythicKeystone.Enabled = 1
 ###################################################################################################
 
 ###################################################################################################
+# WorldChat
+#
+#   WorldChat.Enable
+#        Description: Enable/disable world chat.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+WorldChat.Enable = 1
+
+#
+###################################################################################################
+
+###################################################################################################
 # Dynamic XP Rate #
 #
 #
@@ -4245,6 +4248,57 @@ Dungeon.WeightedMythicKeystone.Enabled = 1
 #
 
 DynamicXP.Enable = 0
+
+#
+###################################################################################################
+
+###################################################################################################
+# SinglePlayer options
+#
+#   SinglePlayer.HPMOD.Enabled
+#       Description: Enable\Disable hp mod of player.
+#                    Mod for singleplayer or low populated servers.
+#       Default:     0 - (Disabled)
+#                    1 - (Enabled)
+
+SinglePlayer.HPMOD.Enabled = 0
+
+#   SinglePlayer.HPMOD
+#       Description: Set amount of hp for player.
+#                    (base_hp * X.X).
+#       Default:     1.0  - 100% hp
+#                    0.5  -  50% hp
+#                    0.01 -   1% hp
+#                    5.0  - 500% hp
+
+SinglePlayer.HPMOD = 5.0
+
+#   Solocraft.Enable
+#       Description: Solocraft is a mod that boosts stats of players on dungeons and raids.
+#                    Mod for singleplayer or low populated servers.
+#       Default:     0 (disabled)
+#                    1 (enabled)
+
+Solocraft.Enable = 0
+
+#   Solocraft.Announce
+#       Description: If solocraft is enabled, announce that it is on when entering a dungeon?
+#       Default:     0 (disabled)
+#                    1 (enabled)
+
+Solocraft.Announce = 0
+
+#   Difficulty Multipliers
+#       Description: Difficulty multipliers for dungeons.
+#       Defaults: 5, 10, 15, 10, 25, 30, 40
+
+Solocraft.Dungeon = 5
+Solocraft.Heroic = 10
+Solocraft.Mythic = 15
+Solocraft.Raid10 = 10
+Solocraft.Raid25 = 25
+Solocraft.Raid30 = 30
+Solocraft.Raid40 = 40
 
 #
 ###################################################################################################

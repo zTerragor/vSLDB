@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -281,12 +281,7 @@ WorldPacket const* WorldPackets::Query::QueryGameObjectResponse::Write()
         for (int8 i = 0; i < 4; ++i)
             statsData << Stats.Name[i];
 
-        // set icon to default if object is a herb -Varjgard
-        if(Stats.IconName == "Herb")
-            statsData << "";
-        else
-            statsData << Stats.IconName;
-
+        statsData << Stats.IconName;
         statsData << Stats.CastBarCaption;
         statsData << Stats.UnkString;
 

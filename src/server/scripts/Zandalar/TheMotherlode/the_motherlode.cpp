@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -21,20 +21,8 @@
 #include "ScriptMgr.h"
 #include "the_motherlode.h"
 
-//136776
-struct npc_mine_cart_136776 : public ScriptedAI
-{
-    npc_mine_cart_136776(Creature* creature) : ScriptedAI(creature) { }
-
-    void Reset() override
-    {
-        ScriptedAI::Reset();
-        me->SetFaction(35);
-        me->SetReactState(REACT_PASSIVE);
-    }
-};
 
 void AddSC_the_motherlode()
 {
-     RegisterCreatureAI(npc_mine_cart_136776);
+
 }

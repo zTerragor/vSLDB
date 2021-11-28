@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2021 BfaCore Reforged
+* Copyright (C) 2020 BfaCore
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -411,14 +411,28 @@ public:
 };
 
 
+/* BfaCore Free Repack Welcome message */
+/*class BfaCoreFreeRepackWelcome : public PlayerScript
+{
+public:
+    BfaCoreFreeRepackWelcome() : PlayerScript("BfaCoreFreeRepackWelcome") { }
+
+    void OnLogin(Player* player, bool) override
+    {
+        ChatHandler(player->GetSession()).SendSysMessage("|cffFF0000 This is BfaCore Free Repack. Donate to remove ads and limitations.|r");
+        ChatHandler(player->GetSession()).SendSysMessage("|cffFF0000 BfaCore official discord: https://discord.gg/57D59ed BfaCore@yahoo.com|r");
+    }
+};*/
+
 void AddSC_custom_player_script()
 {
     RegisterPlayerScript(playerscript_recruiter);
-    //RegisterPlayerScript(OnLegionArrival);          // TEMP FIX! Quest 40519 and 43926 - "legion returns". remove it when legion start quests are properly fixed
-    //RegisterPlayerScript(On110Arrival);             // TEMP FIX! Quest 43341 - "uniting the isles".
+    RegisterPlayerScript(OnLegionArrival);          // TEMP FIX! Quest 40519 and 43926 - "legion returns". remove it when legion start quests are properly fixed
+    RegisterPlayerScript(On110Arrival);             // TEMP FIX! Quest 43341 - "uniting the isles".
     RegisterPlayerScript(OnBfaArrival);             // TEMP FIX! remove it when lordaeron battle is properly fixed.
     RegisterPlayerScript(On120Arrival);             // TEMP FIX! remove it when bfa starting is properly fixed.
     RegisterPlayerScript(WorgenRunningWild);
     RegisterPlayerScript(PlayerSavingOnLogoutFix);
+    //RegisterPlayerScript(BfaCoreFreeRepackWelcome);
 }
 

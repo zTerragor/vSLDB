@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -427,7 +427,7 @@ bool Quest::IsWorldQuest() const
             break;
     }
 
-    return HasFlagEx(QUEST_FLAGS_EX_IS_WORLD_QUEST);
+    return false;
 }
 
 bool Quest::IsAllowedInRaid(Difficulty difficulty) const

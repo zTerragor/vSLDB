@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -78,11 +78,11 @@ void AddSC_boss_rawani_kanae();
 void AddSC_boss_grong();
 void AddSC_boss_jadefire_masters();
 void AddSC_boss_opulence();
-void AddSC_boss_conclave_of_the_chosen();
+//void AddSC_boss_conclave_of_the_chosen();
 void AddSC_boss_high_tinker_mekkatorque();
 void AddSC_boss_king_rastakhan();
-//void AddSC_boss_stormwall_blockade();
-//void AddSC_boss_lady_jaina_proudmoore();
+void AddSC_boss_stormwall_blockade();
+void AddSC_boss_lady_jaina_proudmoore();
 
 void AddZandalarScripts()
 {
@@ -149,9 +149,9 @@ void AddZandalarScripts()
     AddSC_boss_grong();
     AddSC_boss_jadefire_masters();
     AddSC_boss_opulence();
-    AddSC_boss_conclave_of_the_chosen();
+    //AddSC_boss_conclave_of_the_chosen();
     AddSC_boss_high_tinker_mekkatorque();
     AddSC_boss_king_rastakhan();
-    //AddSC_boss_stormwall_blockade();
-    //AddSC_boss_lady_jaina_proudmoore();
+    AddSC_boss_stormwall_blockade();
+    AddSC_boss_lady_jaina_proudmoore();
 }

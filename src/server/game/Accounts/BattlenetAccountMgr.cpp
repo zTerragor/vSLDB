@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -50,7 +50,7 @@ AccountOpResult Battlenet::AccountMgr::CreateBattlenetAccount(std::string email,
 
 
     /* create game account */
-    *gameAccountName = std::to_string(newAccountId) + "#1";
+    *gameAccountName = email;
     GameAccountMgr::instance()->CreateAccount(*gameAccountName, password, email, newAccountId, 1);
 
 

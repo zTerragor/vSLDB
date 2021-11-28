@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,7 +16,7 @@
  */
 
 #include "GitRevision.h"
-#include "src/genrev/CMakeFiles/revision_data.h"
+#include "revision_data.h"
 
 char const* GitRevision::GetHash()
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -27,6 +27,7 @@ void AddSC_paladin_spell_scripts();
 void AddSC_priest_spell_scripts();
 void AddSC_rogue_spell_scripts();
 void AddSC_shaman_spell_scripts();
+void AddSC_npc_totem_scripts();
 void AddSC_warlock_spell_scripts();
 void AddSC_warrior_spell_scripts();
 void AddSC_quest_spell_scripts();
@@ -50,6 +51,7 @@ void AddSpellsScripts()
     AddSC_priest_spell_scripts();
     AddSC_rogue_spell_scripts();
     AddSC_shaman_spell_scripts();
+    AddSC_npc_totem_scripts();
     AddSC_warlock_spell_scripts();
     AddSC_warrior_spell_scripts();
     AddSC_quest_spell_scripts();

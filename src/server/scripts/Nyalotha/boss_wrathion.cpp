@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2021 BfaCore Reforged
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include "nyalotha.h"
 #include "AreaTrigger.h"
 #include "AreaTriggerAI.h"
@@ -189,14 +172,13 @@ struct boss_wrathion : public BossAI
 
 private:
     bool _introDone;
-    uint8 cracklingShards;
 
     void Reset() override
     {
         BossAI::Reset();
         if (!_introDone)
         {
-            if (Creature* nzothTalk = me->FindNearestCreature(NPC_NZOTH_CONTROLLER, 100.0f, true))
+            if (Creature* nzothTalk = me->FindNearestCreature(NPC_NZOTH_WRATHION_INTRO, 100.0f, true))
             {
                 AddTimedDelayedOperation(100, [this, nzothTalk]() -> void
                 {
@@ -223,7 +205,6 @@ private:
     {
         BossAI::EnterCombat(u);
         Talk(SAY_AGGRO);
-        this->cracklingShards = 0;
         SchedulePhase1();
     }
 
@@ -247,7 +228,7 @@ private:
         events.ScheduleEvent(SPELL_SCALES_OF_WRATHION_MISSILE,      3s,     PHASE_2);
         events.ScheduleEvent(SPELL_CRACKLING_SHARD_SUMMON_TARGETS,  3s,     PHASE_2);
 
-        if (IsHeroic() || IsMythic())
+        if (IsHeroic())
             for (uint8 i = 0; i < 3; ++i)
                 me->CastSpell(GetRandomRoomPosition(), SPELL_ASSASSIN_CREATION_MISSILE, true);
     }
@@ -306,22 +287,19 @@ private:
                 // On TC, speed also affect non-missiles effects
                 if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_SCALES_OF_WRATHION_MISSILE))
                 {
-                    if (SpellEffectInfo const* effectInfo = spellInfo->GetEffect(GetDifficulty()))
+                    if (SpellEffectInfo const* effectInfo = spellInfo->GetEffect(GetDifficulty(), EFFECT_1))
                     {
                         Position destPos = GetRandomRoomPosition();
 
                         me->CastSpell(destPos, SPELL_SCALES_OF_WRATHION_MISSILE, true);
-                        //AreaTrigger::CreateAreaTrigger(effectInfo->MiscValue, me, nullptr, spellInfo, destPos, spellInfo->GetDuration(), me->GetCastSpellXSpellVisualId(spellInfo));
+                        AreaTrigger::CreateAreaTrigger(effectInfo->MiscValue, me, nullptr, spellInfo, destPos, spellInfo->GetDuration(), me->GetCastSpellXSpellVisualId(spellInfo));
                     }
                 }
 
                 events.Repeat(10s);
                 break;
             case SPELL_CRACKLING_SHARD_SUMMON_TARGETS:
-                cracklingShards++;
                 me->CastSpell(nullptr, SPELL_CRACKLING_SHARD_SUMMON_TARGETS, true);
-                if (this->cracklingShards == 3)
-                    me->CastSpell(nullptr, SPELL_BERSERK, true);
                 break;
         }
     }

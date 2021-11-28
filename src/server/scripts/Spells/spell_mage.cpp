@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -41,6 +41,7 @@
 
 enum MageSpells
 {
+    //7.3.2.25549
     SPELL_MAGE_COLD_SNAP                         = 235219,
     SPELL_MAGE_FROST_NOVA                        = 122,
     SPELL_MAGE_CONE_OF_COLD                      = 120,
@@ -113,13 +114,13 @@ enum MageSpells
     SPELL_MAGE_HEATING_UP                        = 48107,
     SPELL_MAGE_HOT_STREAK                        = 48108,
     SPELL_MAGE_ENHANCED_PYROTECHNICS_AURA        = 157644,
+
     SPELL_MAGE_INCANTERS_FLOW_BUFF               = 116267,
     SPELL_MAGE_RUNE_OF_POWER_BUFF                = 116014,
     SPELL_MAGE_OVERPOWERED                       = 155147,
     SPELL_MAGE_ARCANE_POWER                      = 12042,
     SPELL_MAGE_CHRONO_SHIFT                      = 235711,
     SPELL_MAGE_CHRONO_SHIFT_SLOW                 = 236299,
-    SPELL_MAGE_CHRONO_SHIFT_BUFF                 = 236298,
     SPELL_MAGE_ARCANE_BLAST                      = 30451,
     SPELL_MAGE_ARCANE_BARRAGE                    = 44425,
     SPELL_MAGE_ARCANE_BARRAGE_TRIGGERED          = 241241,
@@ -133,6 +134,8 @@ enum MageSpells
     SPELL_MAGE_ARCANE_MISSILES_CHARGES           = 79683,
     SPELL_MAGE_ARCANE_ORB_DAMAGE                 = 153640,
     SPELL_MAGE_ARCANE_AMPLIFICATION              = 236628,
+
+    //7.3.2.25549 END
     SPELL_MAGE_RING_OF_FROST_FREEZE              = 82691,
     SPELL_MAGE_RING_OF_FROST_IMMUNE              = 91264,
     SPELL_MAGE_RING_OF_FROST                     = 113724,
@@ -204,10 +207,6 @@ enum MageSpells
     SPELL_BLOOD_SIPHON_TRIGGER = 264108, //ok
     SPELL_ARCANE_PRESSURE_TRIGGER = 274594, //ok
     SPELL_FLAMES_OF_ALACRITY_TRIGGER = 272932,
-    SPELL_MAGE_PRISMATIC_CLOAK = 198064,
-    SPELL_MAGE_PRISMATIC_CLOAK_BUFF = 198065,
-    SPELL_MAGE_CHAIN_REACTION_BFA = 278309,
-    SPELL_MAGE_CHAIN_REACTION_MOD_LANCE = 278310,
 
     SplittingIce = 56377,
     IciclesStack = 205473,
@@ -518,9 +517,6 @@ class spell_mage_arcane_barrage : public SpellScript
             AddPct(damage, ((1 + _chainTargetCount) * aurEff->GetAmount()));
 
         SetHitDamage(damage);
-
-        if (GetCaster()->HasAura(SPELL_MAGE_CHRONO_SHIFT))
-           GetHitUnit()->AddAura(SPELL_MAGE_CHRONO_SHIFT_SLOW);
     }
 
     void RemoveCharges()
@@ -871,7 +867,7 @@ class spell_mage_frenetic_speed : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return eventInfo.GetSpellInfo()->Id == SPELL_MAGE_SCORCH;
+        return eventInfo.GetSpellInfo() && eventInfo.GetSpellInfo()->Id == SPELL_MAGE_SCORCH;
     }
 
     void Register() override
@@ -1347,9 +1343,6 @@ class spell_mage_ice_lance : public SpellScript
                 caster->RemoveAura(SPELL_MAGE_FINGERS_OF_FROST_VISUAL_UI);
             fingersOfFrost->ModStackAmount(-1);
         }
-
-        if (caster->HasAura(SPELL_MAGE_CHAIN_REACTION_BFA) && target->HasAura(SPELL_MAGE_CHILLED))
-            caster->CastSpell(nullptr, SPELL_MAGE_CHAIN_REACTION_MOD_LANCE, true);
     }
 
     void HandleAfterHit()
@@ -1521,7 +1514,7 @@ class spell_mage_frostbolt : public SpellScript
         // Fingers of Frost
         if (caster->HasSpell(SPELL_MAGE_FINGERS_OF_FROST))
         {
-            float fingersFrostChance = 15.0f;
+            float fingersFrostChance = sSpellMgr->GetSpellInfo(SPELL_MAGE_FINGERS_OF_FROST)->GetEffect(EFFECT_0)->CalcValue(caster);
 
             if (caster->HasAura(SPELL_MAGE_FROZEN_TOUCH))
             {
@@ -1534,7 +1527,8 @@ class spell_mage_frostbolt : public SpellScript
 
             if (roll_chance_f(fingersFrostChance))
             {
-                caster->CastSpell(caster, SPELL_MAGE_FINGERS_OF_FROST_VISUAL_UI, true);
+                if (caster->HasAura(SPELL_MAGE_FINGERS_OF_FROST_AURA))
+                    caster->CastSpell(caster, SPELL_MAGE_FINGERS_OF_FROST_VISUAL_UI, true);
                 caster->CastSpell(caster, SPELL_MAGE_FINGERS_OF_FROST_AURA, true);
             }
         }
@@ -1607,7 +1601,7 @@ class spell_mage_blizzard : public SpellScript
         // Fingers of Frost
         if (caster->HasSpell(SPELL_MAGE_FINGERS_OF_FROST))
         {
-            float fingersFrostChance = 15.0f;
+            float fingersFrostChance = sSpellMgr->GetSpellInfo(SPELL_MAGE_FINGERS_OF_FROST)->GetEffect(EFFECT_0)->CalcValue(caster);
 
             if (caster->HasAura(SPELL_MAGE_FROZEN_TOUCH))
             {
@@ -1620,7 +1614,8 @@ class spell_mage_blizzard : public SpellScript
 
             if (roll_chance_f(fingersFrostChance))
             {
-                caster->CastSpell(caster, SPELL_MAGE_FINGERS_OF_FROST_VISUAL_UI, true);
+                if (caster->HasAura(SPELL_MAGE_FINGERS_OF_FROST_AURA))
+                    caster->CastSpell(caster, SPELL_MAGE_FINGERS_OF_FROST_VISUAL_UI, true);
                 caster->CastSpell(caster, SPELL_MAGE_FINGERS_OF_FROST_AURA, true);
             }
         }
@@ -1649,7 +1644,7 @@ class spell_mage_frozen_orb : public SpellScript
         // Fingers of Frost
         if (caster->HasSpell(SPELL_MAGE_FINGERS_OF_FROST))
         {
-            float fingersFrostChance = 10.0f;
+            float fingersFrostChance = sSpellMgr->GetSpellInfo(SPELL_MAGE_FINGERS_OF_FROST)->GetEffect(EFFECT_0)->CalcValue(caster);
 
             if (caster->HasAura(SPELL_MAGE_FROZEN_TOUCH))
             {
@@ -1662,7 +1657,8 @@ class spell_mage_frozen_orb : public SpellScript
 
             if (roll_chance_f(fingersFrostChance))
             {
-                caster->CastSpell(caster, SPELL_MAGE_FINGERS_OF_FROST_VISUAL_UI, true);
+                if (caster->HasAura(SPELL_MAGE_FINGERS_OF_FROST_AURA))
+                    caster->CastSpell(caster, SPELL_MAGE_FINGERS_OF_FROST_VISUAL_UI, true);
                 caster->CastSpell(caster, SPELL_MAGE_FINGERS_OF_FROST_AURA, true);
             }
         }
@@ -2316,7 +2312,7 @@ public:
 };
 
 // Meteor Burn - 175396
-// AreaTriggerID - 6211
+// AreaTriggerID - 1712
 class at_mage_meteor_burn : public AreaTriggerEntityScript
 {
 public:
@@ -2868,29 +2864,10 @@ class spell_mage_firestarter_pvp : public AuraScript
     }
 };
 
-//1953
-class spell_mage_blink : public SpellScript
-{
-    PrepareSpellScript(spell_mage_blink);
-
-    void HandleLeap()
-    {
-        if (GetCaster()->HasAura(SPELL_MAGE_BLAZING_SOUL))
-            GetCaster()->AddAura(SPELL_MAGE_BLAZING_BARRIER);
-
-        if (GetCaster()->HasAura(SPELL_MAGE_PRISMATIC_CLOAK))
-            GetCaster()->AddAura(SPELL_MAGE_PRISMATIC_CLOAK_BUFF);
-    }
-
-    void Register() override
-    {
-        OnCast += SpellCastFn(spell_mage_blink::HandleLeap);
-    }
-};
-
 void AddSC_mage_spell_scripts()
 {
     new playerscript_mage_arcane();
+
     new spell_mage_combustion();
     new spell_mage_incanters_flow();
     new spell_mage_polymorph_cast_visual();
@@ -2901,8 +2878,11 @@ void AddSC_mage_spell_scripts()
     new spell_mage_cauterize();
     new spell_mage_conjure_refreshment();
     RegisterAuraScript(spell_mage_ice_floes);
+
     RegisterSpellScript(spell_mage_ebonbolt);
     RegisterSpellScript(spell_mage_ebonbolt_damage);
+
+    //7.3.2.25549
     RegisterSpellScript(spell_mage_cold_snap);
     RegisterSpellScript(spell_mage_cone_of_cold);
     RegisterSpellScript(spell_mage_ice_lance);
@@ -2942,7 +2922,9 @@ void AddSC_mage_spell_scripts()
     RegisterAuraScript(spell_mage_chilled);
     RegisterAuraScript(spell_mage_ray_of_frost);
     RegisterAuraScript(spell_mage_ray_of_frost_buff);
+    //7.3.2.25549 END
     RegisterAuraScript(spell_mage_firestarter_pvp);
+
     RegisterSpellScript(spell_mage_flamestrike);
     RegisterAuraScript(spell_mage_ring_of_frost);
     new spell_mage_ring_of_frost_stun();
@@ -2950,7 +2932,11 @@ void AddSC_mage_spell_scripts()
     RegisterAuraScript(spell_mage_clearcasting);
     RegisterAuraScript(spell_mage_presence_of_mind);
     RegisterSpellScript(spell_mage_arcane_blast);
+
+    // Spell Pet scripts
     RegisterAuraScript(spell_mage_pet_freeze);
+
+    // AreaTrigger scripts
     new at_mage_meteor_timer();
     new at_mage_meteor_burn();
     new at_mage_blizzard();
@@ -2959,6 +2945,7 @@ void AddSC_mage_spell_scripts()
     RegisterAreaTriggerAI(at_mage_arcane_orb);
     RegisterAreaTriggerAI(at_mage_flame_patch);
     RegisterAreaTriggerAI(at_mage_cinderstorm);
+
+    // NPC Scripts
     new npc_mirror_image();
-    RegisterSpellScript(spell_mage_blink);
 }

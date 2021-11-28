@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2021 BfaCore Reforged
+* Copyright (C) 2020 BfaCore
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -164,14 +164,6 @@ struct quest_out_like_flynn : public QuestScript
 struct npc_flynn_fairwind : public ScriptedAI
 {
     npc_flynn_fairwind(Creature* creature) : ScriptedAI(creature) { }
-
-    void Reset() override
-    {
-        if (me->GetAreaId() != 8978)
-            me->AddNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-        me->SetReactState(REACT_PASSIVE);
-        me->AddUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-    };
 
     enum FlynnTalks
     {
@@ -344,9 +336,6 @@ struct npc_flynn_fairwind_follower : public FollowerAI
 
     void Reset() override
     {
-        me->SetReactState(REACT_PASSIVE);
-        me->SetLevel(120);
-        me->AddUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         me->GetScheduler().Schedule(1s, [this](TaskContext context)
         {
             if (me->FindNearestGameObject(GOB_CELL_BLOCK_GATE, 10.f))

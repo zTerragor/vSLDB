@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -1481,6 +1481,41 @@ public:
     }
 };
 
+class spell_sha_earthgrab : public SpellScriptLoader
+{
+public:
+    spell_sha_earthgrab() : SpellScriptLoader("spell_sha_earthgrab") { }
+
+    class spell_sha_earthgrab_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_sha_earthgrab_SpellScript);
+
+        void HandleOnHit()
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (Unit* target = GetHitUnit())
+                {
+                    if (target->HasAura(SPELL_SHAMAN_EARTHGRAB_IMMUNITY, caster->GetGUID()))
+                        caster->CastSpell(target, SPELL_SHAMAN_EARTHBIND_FOR_EARTHGRAB_TOTEM, true);
+                    else
+                        caster->CastSpell(target, SPELL_SHAMAN_EARTHGRAB_IMMUNITY, true);
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnHit += SpellHitFn(spell_sha_earthgrab_SpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_sha_earthgrab_SpellScript();
+    }
+};
+
 // 61882
 class aura_sha_earthquake : public AuraScript
 {
@@ -1522,7 +1557,7 @@ class spell_sha_earthquake_tick : public SpellScript
     void HandleOnHit()
     {
         if (Unit* target = GetHitUnit())
-            if (roll_chance_f(10))
+            if (roll_chance_i(GetEffectInfo(EFFECT_1)->BasePoints))
                 GetCaster()->CastSpell(target, SPELL_SHAMAN_EARTHQUAKE_KNOCKING_DOWN, true);
     }
 
@@ -2525,6 +2560,28 @@ public:
     }
 };
 
+
+//NPC ID : 97285
+//NPC NAME : Wind Rush Totem
+struct npc_wind_rush_totem : public ScriptedAI
+{
+    npc_wind_rush_totem(Creature* creature) : ScriptedAI(creature) {}
+
+    void Reset() override
+    {
+        me->GetScheduler().Schedule(500ms, [this](TaskContext context)
+        {
+            std::list<Unit*> unitList;
+            me->GetFriendlyUnitListInRange(unitList, 10.0f, true);
+
+            for (Unit* target : unitList)
+                me->CastSpell(target, SPELL_TOTEM_WIND_RUSH_EFFECT, true);
+
+            context.Repeat();
+        });
+    }
+};
+
 //NPC ID : 100099
 //NPC NAME : Voodoo Totem
 struct npc_voodoo_totem : public ScriptedAI
@@ -2537,12 +2594,19 @@ struct npc_voodoo_totem : public ScriptedAI
     }
 };
 
-//61245
-struct npc_capacitor_totem : public ScriptedAI
+//NPC ID : 61245
+//NPC NAME : Lightning Surge Totem
+struct npc_lightning_surge_totem : public ScriptedAI
 {
-    npc_capacitor_totem(Creature* creature) : ScriptedAI(creature) { }
+    npc_lightning_surge_totem(Creature* creature) : ScriptedAI(creature) {}
 
-    void Reset() override { }
+    void Reset() override
+    {
+        me->GetScheduler().Schedule(2s, [this](TaskContext /*context*/)
+        {
+            me->CastSpell(me, SPELL_TOTEM_LIGHTNING_SURGE_EFFECT, true);
+        });
+    }
 };
 
 //NPC ID : 102392
@@ -2575,7 +2639,7 @@ struct npc_liquid_magma_totem : public ScriptedAI
     }
 };
 
-//60561
+//NPC ID : 60561
 struct npc_earth_grab_totem : public ScriptedAI
 {
     npc_earth_grab_totem(Creature* creature) : ScriptedAI(creature) {}
@@ -3931,56 +3995,6 @@ public:
     }
 };
 
-//192077, 12676
-class at_sha_wind_rush_totem : public AreaTriggerAI
-{
-public:
-    at_sha_wind_rush_totem(AreaTrigger* at) : AreaTriggerAI(at) { }
-
-    void OnUnitEnter(Unit* target) override
-    {
-        if (!target->IsPlayer())
-            return;
-
-        if (target->IsFriendlyTo(at->GetCaster()))
-            target->CastSpell(target, SPELL_TOTEM_WIND_RUSH_EFFECT, true);
-    }
-};
-
-//8143
-struct npc_sha_tremor_totem : public ScriptedAI
-{
-    npc_sha_tremor_totem(Creature* c) : ScriptedAI(c) { }
-
-    enum SpellRelated
-    {
-        SPELL_TREMOR_TOTEM_DISPELL = 8146,
-    };
-
-    void Reset() override
-    {
-        ScriptedAI::Reset();
-        me->GetOwner();
-    }
-
-    void OnUpdate(uint32 diff)
-    {        
-        if (diff <= 1000)
-        {
-            std::list<Player*> playerList;
-            me->GetPlayerListInGrid(playerList, 30.0f);
-            if (playerList.size())
-            {
-                for (auto& targets : playerList)
-                {
-                    if (targets->IsFriendlyTo(me->GetOwner()))
-                        if (targets->HasAuraType(SPELL_AURA_MOD_FEAR) || targets->HasAuraType(SPELL_AURA_MOD_FEAR_2) || targets->HasAuraType(SPELL_AURA_MOD_CHARM) || targets->HasAuraType(SPELL_AURA_MOD_CHARM))
-                            me->CastSpell(targets, SPELL_TREMOR_TOTEM_DISPELL, true);
-                }
-            }
-        }
-    }
-};
 
 void AddSC_shaman_spell_scripts()
 {
@@ -4001,6 +4015,7 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_earthen_shield_absorb();
     new spell_sha_earthen_rage_passive();
     new spell_sha_earthen_rage_proc_aura();
+    new spell_sha_earthgrab();
     RegisterAuraScript(aura_sha_earthquake);
     RegisterSpellScript(spell_sha_earthquake_tick);
     RegisterSpellScript(spell_sha_elemental_blast);
@@ -4064,19 +4079,22 @@ void AddSC_shaman_spell_scripts()
     new bfa_spell_flametongue_proc_attack();
     new bfa_spell_crash_lightning();
     new bfa_at_crashing_storm();
-    RegisterAreaTriggerAI(at_sha_wind_rush_totem);
-    RegisterCreatureAI(npc_sha_tremor_totem);
-    RegisterCreatureAI(npc_earth_grab_totem);
-    RegisterCreatureAI(npc_capacitor_totem);
+}
+
+void AddSC_npc_totem_scripts()
+{
     RegisterCreatureAI(npc_ancestral_protection_totem);
     RegisterCreatureAI(npc_cloudburst_totem);
+    RegisterCreatureAI(npc_earth_grab_totem);
     RegisterCreatureAI(npc_earthen_shield_totem);
     RegisterCreatureAI(npc_ember_totem);
     RegisterCreatureAI(npc_grounding_totem);
     RegisterCreatureAI(npc_healing_tide_totem);
+    RegisterCreatureAI(npc_lightning_surge_totem);
     RegisterCreatureAI(npc_liquid_magma_totem);
     RegisterCreatureAI(npc_resonance_totem);
     RegisterCreatureAI(npc_skyfury_totem);
     RegisterCreatureAI(npc_tailwind_totem);
     RegisterCreatureAI(npc_voodoo_totem);
+    RegisterCreatureAI(npc_wind_rush_totem);
 }

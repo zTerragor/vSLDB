@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -167,55 +167,8 @@ class spell_voodoo : public SpellScriptLoader
         }
 };
 
-enum
-{
-    QUEST_YOUNG_AND_VICIOUS = 24626,
-    NPC_SWIFTCLAW = 37989,
-};
-
-//37969
-struct npc_kijara_37969 : public ScriptedAI
-{
-    npc_kijara_37969(Creature* c) : ScriptedAI(c) { }
-
-    void sQuestAccept(Player* player, Quest const* quest) override
-    {
-        if (quest->ID == QUEST_YOUNG_AND_VICIOUS)
-            player->SummonCreature(NPC_SWIFTCLAW, -1553.891f, -5304.168f, 8.625f), TEMPSUMMON_TIMED_DESPAWN, 60000;
-    }
-};
-
-//37989
-struct npc_swiftclaw_37989 : public ScriptedAI
-{
-    npc_swiftclaw_37989(Creature* c) : ScriptedAI(c) { }
-
-    void OnSpellClick(Unit* clicker, bool& result) override
-    {
-        Player* player = clicker->ToPlayer();
-        if (player->GetQuestStatus(QUEST_YOUNG_AND_VICIOUS) == QUEST_STATUS_INCOMPLETE)
-        {
-            player->KilledMonsterCredit(37989);
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
-            me->GetScheduler().Schedule(30s, [this, player](TaskContext context)
-            {
-                if (!player)
-                    return;
-
-                if (player->GetAreaId() != 4875)
-                    return;
-
-                player->KilledMonsterCredit(38002);
-                me->DespawnOrUnsummon();
-            });
-        }
-    }
-};
-
 void AddSC_durotar()
 {
     new npc_lazy_peon();
     new spell_voodoo();
-    RegisterCreatureAI(npc_kijara_37969);
-    RegisterCreatureAI(npc_swiftclaw_37989);
 }

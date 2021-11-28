@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -112,12 +112,6 @@ enum TextRaoul
     TalkAggroRaoul = 0
 };
 
-enum Actions
-{
-    ACTION_COUNT_DEATHS = 1,
-};
-
-
 ///ToDo Script the event with the other 2 boss when become allied, need sniff and info about how they become allied, only did Raoul Allied
 ///This work like Cache of Madness in Zulgurub a different allied by week, is good did that by GameEvent
 
@@ -156,16 +150,6 @@ struct npc_captains_controller : public ScriptedAI
     void Reset() override
     {
         Initialize();
-    }
-    
-     void DoAction(int32 action)
-    {
-        switch (action)
-        {
-        case ACTION_COUNT_DEATHS:
-            ++captainsDeathCount;
-            break;
-        }
     }
 
     void UpdateAI(uint32 diff) override
@@ -369,11 +353,6 @@ struct boss_council_captain : public BossAI
             }
         }
     }
-    
-     Creature* GetController()
-    {
-        return me->FindNearestCreature(NpcCaptainsController, 500.0f);
-    }
 
     void JustDied(Unit* killer) override
     {
@@ -390,11 +369,9 @@ struct boss_council_captain : public BossAI
             break;
         }
         }
-        
-        if (Creature* controller = GetController())
-        {
-            controller->AI()->DoAction(ACTION_COUNT_DEATHS);
-        }
+        //Crash, it needs rewrite later
+        /*if (Creature* capControl = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DataCaptainsController)))
+            ++(ENSURE_AI(npc_captains_controller, capControl->AI())->captainsDeathCount);*/
     }
 
     void MovementInform(uint32 type, uint32 pointId) override

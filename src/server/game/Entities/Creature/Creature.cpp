@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -332,8 +332,10 @@ Creature::~Creature()
     delete i_AI;
     i_AI = nullptr;
 
-    //delete m_wildBattlePet; // pointer deallocated? -Varjgard
-    m_wildBattlePet = nullptr; // lets set it to nullptr instead for future use. -Varjgard
+    delete m_wildBattlePet; // what is this supposed to do??? looks like it does nothing -Varjgard
+
+    //if (m_uint32Values)
+    //    TC_LOG_ERROR("entities.unit", "Deconstruct Creature Entry = %u", GetEntry());
 }
 
 void Creature::AddToWorld()
@@ -2466,6 +2468,9 @@ void Creature::CallForHelp(float radius)
 
 bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /*= true*/) const
 {
+    if (IsInEvadeMode())
+        return false;
+
     // is it true?
     if (!HasReactState(REACT_AGGRESSIVE))
         return false;

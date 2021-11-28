@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -33,8 +33,6 @@ BattlePayDataStoreMgr* BattlePayDataStoreMgr::instance()
 
 namespace
 {
-    Battlepay::Product emptyList;
-
     std::vector<Battlepay::ProductGroup> _productGroups;
     std::vector<Battlepay::ShopEntry> _shopEntries;
     std::map<uint32, Battlepay::Product> _products;
@@ -325,9 +323,8 @@ Battlepay::Product const& BattlePayDataStoreMgr::GetProduct(uint32 productID) co
 {
     if (ProductExist(productID))
         return _products.at(productID); // return productid
-
-    //return {};
-    return emptyList;
+    else
+        return{};
 }
 
 Battlepay::DisplayInfo const* BattlePayDataStoreMgr::GetDisplayInfo(uint32 id) const

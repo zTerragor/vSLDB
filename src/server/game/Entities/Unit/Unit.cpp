@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -9470,10 +9470,8 @@ Unit* Creature::SelectVictim(bool evadeIfNoVictim /*= true*/)
         return nullptr;
     }
 
-    // enter in evade mode if evadeIfNoVictim is set to true
-    // or if distance from distance from spawn point is greater than CONFIG_THREAT_RADIUS.
-    // NOTE: this will break combat on npc if evadeIfNoVictim is set to true. -Varjgard
-    if ((evadeIfNoVictim) || (GetDistance(GetHomePosition()) >= sWorld->getFloatConfig(CONFIG_THREAT_RADIUS)))
+    // enter in evade mode in other case
+    if (evadeIfNoVictim)
         AI()->EnterEvadeMode(CreatureAI::EVADE_REASON_NO_HOSTILES);
 
     return nullptr;

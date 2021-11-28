@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -712,9 +712,11 @@ public:
     {
         TC_LOG_INFO("misc", "Re-Loading `trainer` Table!");
         sObjectMgr->LoadTrainers();
+        sObjectMgr->LoadCreatureTrainers();
         handler->SendGlobalGMSysMessage("DB table `trainer` reloaded.");
         handler->SendGlobalGMSysMessage("DB table `trainer_locale` reloaded.");
         handler->SendGlobalGMSysMessage("DB table `trainer_spell` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `creature_trainer` reloaded.");
         return true;
     }
 

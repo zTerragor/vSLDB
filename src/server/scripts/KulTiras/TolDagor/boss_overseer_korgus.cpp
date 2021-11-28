@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -133,9 +133,9 @@ private:
 };
 
 // 256038 - Deadeye
-class bfa_spell_generic_deadeye : public AuraScript
+class spell_generic_deadeye : public AuraScript
 {
-    PrepareAuraScript(bfa_spell_generic_deadeye);
+    PrepareAuraScript(spell_generic_deadeye);
 
     void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
@@ -152,14 +152,14 @@ class bfa_spell_generic_deadeye : public AuraScript
 
     void Register() override
     {
-        AfterEffectRemove += AuraEffectRemoveFn(bfa_spell_generic_deadeye::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_generic_deadeye::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
 // 256105 - Explosive Burst
-class bfa_spell_explosive_burst : public AuraScript
+class spell_explosive_burst : public AuraScript
 {
-    PrepareAuraScript(bfa_spell_explosive_burst);
+    PrepareAuraScript(spell_explosive_burst);
 
     void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
@@ -176,13 +176,13 @@ class bfa_spell_explosive_burst : public AuraScript
 
     void Register() override
     {
-        AfterEffectRemove += AuraEffectRemoveFn(bfa_spell_explosive_burst::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_explosive_burst::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
 void AddSC_boss_overseer_korgus()
 {
     RegisterCreatureAI(boss_overseer_korgus);
-    RegisterAuraScript(bfa_spell_generic_deadeye);
-    RegisterAuraScript(bfa_spell_explosive_burst);
+    RegisterAuraScript(spell_generic_deadeye);
+    RegisterAuraScript(spell_explosive_burst);
 }

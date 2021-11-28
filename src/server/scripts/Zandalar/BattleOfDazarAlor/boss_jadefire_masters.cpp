@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 BfaCore
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 #include "ScriptMgr.h"
 #include "Creature.h"
 #include "CreatureAI.h"
@@ -73,7 +89,8 @@ enum Spells
     PHOENIX_STRIKE_DAMAGE = 284388,
     //Transmorms, at 100 energy, both bosses transform
     DRAGONS_BREATH = 286396,
-    BLAZING_PHOENIX_TRANSFORM = 282040, //npc 147536, 89730 displayid    
+    BLAZING_PHOENIX_TRANSFORM = 282040, //npc 147536, 89730 displayid
+    
     SPIRITS_OF_XUEN = 285645,
     TIGER_PAW = 285634,
     POUNCE = 286086,
@@ -103,7 +120,6 @@ enum Events
     EVENT_CHECK_BARRIER
 };
 
-//144693,144690
 struct boss_jadefire_masters : public BossAI
 {
     boss_jadefire_masters(Creature* creature) : BossAI(creature, DATA_JADEFIRE_MASTERS) { }
@@ -194,9 +210,13 @@ struct boss_jadefire_masters : public BossAI
             if (Creature* mestrah = me->FindNearestCreature(NPC_MESTRAH, 100.0f, true))
             {
                 if (mestrah->IsInCombat())
+                {
                     return;
+                }
                 else
-                    mestrah->AI()->DoZoneInCombat(nullptr, 250.0f);     
+                {
+                    mestrah->AI()->DoZoneInCombat(nullptr, 250.0f);
+                }
             }
             break;
        }
@@ -213,29 +233,6 @@ struct boss_jadefire_masters : public BossAI
    {
        if (spellInfo->Id == MAGMA_TRAP_MISSILE_TRIGGER)
        {       
-       }
-   }
-
-   void JustDied(Unit* /*who*/) override
-   {
-       if (instance->GetBossState(DATA_JADEFIRE_MASTERS) == DONE)
-       {
-           switch (me->GetEntry())
-           {
-           case NPC_MANCEROY_FLAMEFIST:
-               if (Creature* mestrah = me->FindNearestCreature(NPC_MESTRAH, 100.0f, false))
-               {
-                   if (auto* wallOfSpears = me->FindNearestGameObject(GO_JADEFIRE_MASTERS_HORDE_WALL_OF_SPEARS_MAIN, 100.0f))
-                       wallOfSpears->SetGoState(GO_STATE_ACTIVE);
-
-                   if (IsMythic())
-                       instance->DoCompleteAchievement(13295);
-
-                   if (instance->GetBossState(DATA_FRIDA_IRONBELLOWS) == DONE && instance->GetBossState(DATA_GRONG) == DONE)
-                        instance->DoCompleteAchievement(13289); //Defense of Dazar'alor
-               }
-               break;
-           }
        }
    }
 
@@ -278,12 +275,10 @@ struct boss_jadefire_masters : public BossAI
            switch (me->GetEntry())
            {
            case NPC_MESTRAH:
-                me->SetPower(POWER_ENERGY, 0);
                 events.ScheduleEvent(EVENT_MESTRAH_TRANSFORM, 100ms);
                 break;
 
            case NPC_MANCEROY_FLAMEFIST:
-                me->SetPower(POWER_ENERGY, 0);
                 events.ScheduleEvent(EVENT_MANCEROY_TRANSFORM, 100ms);
                 break;
            }
@@ -379,7 +374,8 @@ struct boss_jadefire_masters : public BossAI
                    Talk(SAY_MESTRAH_TRANSFORM);
                    me->SetDisplayId(46087);
                    events.ScheduleEvent(EVENT_DRAGONS_BREATH, 3s);
-               }               
+               }
+               //me->SetPower(POWER_ENERGY, 0);
            }
            break;
        }
@@ -400,7 +396,8 @@ struct boss_jadefire_masters : public BossAI
                    me->SetObjectScale(2.0f);
                    events.ScheduleEvent(EVENT_RISING_FLAMES, 3s);
                    events.ScheduleEvent(EVENT_MAGMA_TRAPS, 8s);
-               }               
+               }
+               //me->SetPower(POWER_ENERGY, 0);
            }          
        }
        break;
@@ -425,12 +422,6 @@ struct boss_jadefire_masters : public BossAI
            {
                Talk(SAY_MANCEROY_MAGMA_TRAP);
            }
-
-           for (uint8 i = 0; i < 3; i++)
-           {
-               me->SummonCreature(NPC_MAGMA_STALKER, me->GetRandomNearPosition(30.0f), TEMPSUMMON_MANUAL_DESPAWN);
-           }
-
            std::list<Creature*> c_li;
            me->GetCreatureListWithEntryInGrid(c_li, NPC_MAGMA_STALKER, 500.0f);
            for (auto& stalkers : c_li)
@@ -503,7 +494,9 @@ class aura_searing_embers : public AuraScript
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {        
         if (Unit* caster = GetCaster())
+        {
             caster->CastSpell(GetTarget(), UNLEASHED_EMBER, true);
+        }
     }
 
     void Register() override
@@ -520,7 +513,9 @@ class aura_rising_flames : public AuraScript
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* caster = GetCaster())
+        {
             caster->CastSpell(GetTarget(), BURNOUT, true);
+        }
     }
 
     void Register() override
@@ -537,13 +532,14 @@ struct npc_living_bomb_bod : public ScriptedAI
     void Reset() override
     {
         ScriptedAI::Reset();
-        me->SetReactState(REACT_PASSIVE);
     }
 
     void OnSpellFinished(SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == EXPLOSION)
+        {
             me->DespawnOrUnsummon();
+        }
     }
 };
 
@@ -572,13 +568,17 @@ struct npc_magma_trap_bod : public ScriptedAI
     void MoveInLineOfSight(Unit* u ) override
     {
         if (u->IsPlayer() && me->GetDistance(u) <= 3.0f)
+        {
             me->CastSpell(u, MAGMA_TRAP_KNOCK);
+        }
     }
 
     void OnSpellFinished(SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == MAGMA_TRAP_KNOCK)
+        {
             me->DespawnOrUnsummon();
+        }
     }
 };
 
@@ -646,55 +646,6 @@ struct npc_generic_barrier : public ScriptedAI
     }
 };
 
-//147374
-struct npc_super_meter : public ScriptedAI
-{
-    npc_super_meter(Creature* c) : ScriptedAI(c) { }
-
-    void Reset() override
-    {
-        ScriptedAI::Reset();
-        call_masters = false;
-    }
-
-    void MoveInLineOfSight(Unit* unit) override
-    {
-        if (instance->GetBossState(DATA_FRIDA_IRONBELLOWS) == DONE || instance->GetBossState(DATA_RAWANI_KANAE) == DONE && !call_masters)
-        {            
-            if (unit->IsPlayer() && unit->GetDistance2d(me) < 45.0f)
-            {
-                call_masters = true;
-                if (Creature* manceroy = me->FindNearestCreature(NPC_MANCEROY_FLAMEFIST, 100.0f, true))
-                {
-                    manceroy->SetWalk(true);
-                    manceroy->GetMotionMaster()->MovePoint(1, -922.332f, 796.938f, 368.412f, true);
-                    manceroy->GetScheduler().Schedule(5s, [manceroy] (TaskContext context)
-                    {
-                        manceroy->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
-                        manceroy->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
-                        manceroy->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    });
-                }
-                if (Creature* mestrah = me->FindNearestCreature(NPC_MESTRAH, 100.0f, true))
-                {
-                    mestrah->SetWalk(true);
-                    mestrah->GetMotionMaster()->MovePoint(1, -922.101f, 813.481f, 368.412f, true);
-                    mestrah->GetScheduler().Schedule(5s, [mestrah] (TaskContext context)
-                    {
-                        mestrah->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
-                        mestrah->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
-                        mestrah->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    });
-                }
-            }
-        }
-    }
-
-private:
-    TaskScheduler scheduler;
-    bool call_masters;
-};
-
 void AddSC_boss_jadefire_masters()
 {
     RegisterCreatureAI(boss_jadefire_masters);
@@ -706,5 +657,4 @@ void AddSC_boss_jadefire_masters()
     RegisterCreatureAI(npc_generic_stalker);
     RegisterCreatureAI(npc_spirit_of_niuzao);
     RegisterCreatureAI(npc_generic_barrier);
-    RegisterCreatureAI(npc_super_meter);
 }

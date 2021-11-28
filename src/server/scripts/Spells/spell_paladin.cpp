@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -133,14 +133,11 @@ enum PaladinSpells
     SPELL_PALADIN_WORD_OF_GLORY                 = 210191,
     SPELL_PALADIN_WORD_OF_GLORY_HEAL            = 214894,
     SPELL_PALADIN_BLESSED_HAMMER                = 204019,
-    //8.0
     SPELL_PALADIN_JUDGMENT_OF_LIGHT             = 183778,
     SPELL_PALADIN_JUDGMENT_OF_LIGHT_TARGET_DEBUFF = 196941, 
     SPELL_PALADIN_AWAKENING                       = 248033,
     SPELL_PALADIN_HAND_OF_HINDRANCE = 183218,
     SPELL_PALADIN_LAW_AND_ORDER = 204934,
-    SPELL_PALADIN_DARKEST_BEFORE_THE_DAWN = 210378,
-    SPELL_PALADIN_DARKEST_BEFORE_THE_DAWN_BUFF = 210391
 };
 
 enum PaladinNPCs
@@ -2224,24 +2221,6 @@ public:
     }
 };
 
-//210378
-class aura_darkest_before_the_dawn : public AuraScript
-{
-    PrepareAuraScript(aura_darkest_before_the_dawn);
-
-    void OnTick(AuraEffect const* /*aurEff*/)
-    {
-        if (GetCaster())
-            if (Aura* dawnTrigger = GetCaster()->GetAura(SPELL_PALADIN_DARKEST_BEFORE_THE_DAWN))
-                GetCaster()->AddAura(SPELL_PALADIN_DARKEST_BEFORE_THE_DAWN_BUFF);
-    }
-
-    void Register() override
-    {
-        OnEffectPeriodic += AuraEffectPeriodicFn(aura_darkest_before_the_dawn::OnTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-    }
-};
-
 void AddSC_paladin_spell_scripts()
 {
     new spell_pal_bastion_of_light();
@@ -2300,5 +2279,4 @@ void AddSC_paladin_spell_scripts()
     RegisterPlayerScript(absolution);
     RegisterAuraScript(spell_pal_hand_of_hindrance);
     RegisterPlayerScript(fist_of_justice);
-    RegisterAuraScript(aura_darkest_before_the_dawn);
 }

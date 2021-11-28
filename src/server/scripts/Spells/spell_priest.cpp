@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 BfaCore Reforged
+ * Copyright (C) 2020 BfaCore
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -210,7 +210,6 @@ enum PriestSpells
     SPELL_PRIEST_DARK_VOID                          = 263346,
     SPELL_PRIEST_DARK_ASCENSION                     = 280711,
     SPELL_PRIEST_DARK_ASCENSION_DAMAGE              = 280800,
-
     //This needs to be scripted
     SPELL_PRIEST_LIGHT_OF_THE_NAARU_HOLY            = 196985,
     SPELL_PRIEST_ENDURING_RENEWAL_HOLY              = 200153,
@@ -244,17 +243,6 @@ class spell_pri_power_word_shield : public SpellScript
 {
     PrepareSpellScript(spell_pri_power_word_shield);
 
-    SpellCastResult CheckCast()
-    {
-        Unit* caster = GetCaster();
-        Unit* target = GetExplTargetUnit();
-
-        if (target->HasAura(SPELL_PRIEST_WEAKENED_SOUL))
-            return SPELL_FAILED_DONT_REPORT;
-
-        return SPELL_CAST_OK;
-    }
-
     void OnHit(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
@@ -262,15 +250,12 @@ class spell_pri_power_word_shield : public SpellScript
         if (!caster || !target)
             return;
 
-        caster->CastSpell(target, SPELL_PRIEST_WEAKENED_SOUL, true);
-
         if (caster->HasAura(SPELL_PRIEST_ATONEMENT))
             caster->CastSpell(target, SPELL_PRIEST_ATONEMENT_AURA, true);
     }
 
     void Register() override
     {
-        OnCheckCast += SpellCheckCastFn(spell_pri_power_word_shield::CheckCast);
         OnEffectHitTarget += SpellEffectFn(spell_pri_power_word_shield::OnHit, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
     }
 };
@@ -376,41 +361,49 @@ class spell_pri_twist_of_fate : public AuraScript
 };
 
 // 78203 - Shadowy Apparitions
-class spell_pri_shadowy_apparitions : public AuraScript
+class spell_pri_shadowy_apparitions : public SpellScriptLoader
 {
-    PrepareAuraScript(spell_pri_shadowy_apparitions);
+public:
+    spell_pri_shadowy_apparitions() : SpellScriptLoader("spell_pri_shadowy_apparitions") { }
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
+    class spell_pri_shadowy_apparitions_AuraScript : public AuraScript
     {
-        return ValidateSpellInfo(
+        PrepareAuraScript(spell_pri_shadowy_apparitions_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            SPELL_PRIEST_SHADOWY_APPARITION_MISSILE,
-            SPELL_PRIEST_SHADOW_WORD_PAIN
-        });
-    }
+            return ValidateSpellInfo(
+                {
+                    SPELL_PRIEST_SHADOWY_APPARITION_MISSILE,
+                    SPELL_PRIEST_SHADOW_WORD_PAIN
+                });
+        }
 
-    bool CheckProc(ProcEventInfo& eventInfo)
-    {
-        if (eventInfo.GetSpellInfo()->Id == SPELL_PRIEST_SHADOW_WORD_PAIN)
-            if ((eventInfo.GetHitMask() & PROC_HIT_CRITICAL))
-                return true;
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            if (eventInfo.GetSpellInfo()->Id == SPELL_PRIEST_SHADOW_WORD_PAIN)
+                if ((eventInfo.GetHitMask() & PROC_HIT_CRITICAL))
+                    return true;
 
-        return false;
-    }
+            return false;
+        }
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
-    {
-        if (GetTarget() && eventInfo.GetActionTarget())
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
         {
             GetTarget()->CastSpell(eventInfo.GetActionTarget(), SPELL_PRIEST_SHADOWY_APPARITION_MISSILE, true);
             GetTarget()->SendPlaySpellVisual(eventInfo.GetActionTarget()->GetGUID(), SPELL_VISUAL_SHADOWY_APPARITION, SPELL_MISS_NONE, SPELL_MISS_NONE, SHADOWY_APPARITION_TRAVEL_SPEED, false);
         }
-    }
 
-    void Register() override
+        void Register() override
+        {
+            OnEffectProc += AuraEffectProcFn(spell_pri_shadowy_apparitions_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+            DoCheckProc += AuraCheckProcFn(spell_pri_shadowy_apparitions_AuraScript::CheckProc);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
     {
-        OnEffectProc += AuraEffectProcFn(spell_pri_shadowy_apparitions::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
-        DoCheckProc += AuraCheckProcFn(spell_pri_shadowy_apparitions::CheckProc);
+        return new spell_pri_shadowy_apparitions_AuraScript();
     }
 };
 
@@ -2968,7 +2961,7 @@ void AddSC_priest_spell_scripts()
     RegisterAuraScript(spell_pri_power_of_the_dark_side);
     new spell_pri_void_shift();
 	new spell_pri_voidform();
-    RegisterAuraScript(spell_pri_shadowy_apparitions);
+    new spell_pri_shadowy_apparitions();
     RegisterAuraScript(spell_pri_spirit_of_redemption);
     RegisterAuraScript(spell_pri_spirit_of_redemption_form);
     RegisterSpellScript(spell_pri_holy_word_chastise);
