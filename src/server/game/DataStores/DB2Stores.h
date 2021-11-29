@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 BfaCore
+ * Copyright (C) 2021 LoA Core 
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -304,7 +304,7 @@ public:
 
     static DB2Manager& Instance();
 
-    void LoadStores(std::string const& dataPath, LocaleConstant defaultLocale);
+    uint32 LoadStores(std::string const& dataPath, LocaleConstant defaultLocale);
     DB2StorageBase const* GetStorage(uint32 type) const;
 
     void LoadHotfixData();
