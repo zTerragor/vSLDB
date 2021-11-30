@@ -1,4 +1,4 @@
-loot FIX Dungeons Cataclysm part1 LOOTCHANCE & LOOTID
+
 UPDATE creature_loot_template SET Chance = 7 WHERE entry = 43878 ;
 UPDATE creature_template SET lootid=43878 WHERE entry = 43878;
 UPDATE creature_loot_template SET Chance = 7 WHERE entry = 43873 ;
